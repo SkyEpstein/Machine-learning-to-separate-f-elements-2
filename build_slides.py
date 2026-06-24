@@ -80,6 +80,13 @@ put2(tf, "Uncertainty interval:  ", "instead of a single number, the model retur
 put2(tf, "90 percent interval:  ", "a range built to contain the true logD about 90 percent of the time. An 80 percent interval is narrower and contains it about 80 percent of the time.", first=False)
 put2(tf, "Coverage:  ", "the fraction of points whose true value actually lands inside the interval. We measured 0.89 to 0.90 against the 90 percent target, so the ranges are honest.", first=False)
 
+# what a 90 percent interval means
+s = slide(); title(s, "What a 90 percent interval means")
+tf = box(s, 0.7, 1.4, 12.0, 1.95)
+put(tf, "The model gives a range, not just a single number. For example, it might predict a logD of 1.5 and report that it is 90 percent sure the true value is between 0.6 and 2.4. Across many predictions, each with its own 90 percent range, the true value should land inside about 90 times out of 100, while an 80 percent range is narrower and contains it about 80 times out of 100.", 15, BLACK, space_after=8)
+put(tf, "Coverage is how often this actually happens. Checking every range against the real value, the true logD landed inside the 90 percent range 89 to 90 percent of the time, right on target, which is what it means to say the ranges are honest.", 15, BLACK, first=False)
+add_img(s, "figures/coverage_illustration.png", 3.45, 9.0, 3.75)
+
 # 5-6 confidence curves
 fig_slide("confidence_curve_a", "Accuracy versus confidence, Track A", "Moving right to left keeps fewer but more confident predictions. The most confident tenth (the tenth with the smallest estimated error) reaches R-squared 0.912 and RMSE 0.493, against 0.466 and 1.148 over all predictions.")
 fig_slide("confidence_curve_b", "Accuracy versus confidence, Track B", "The same pattern holds for condition optimization: the most confident tenth reaches R-squared 0.940 and RMSE 0.341, against 0.725 and 0.823 over all predictions.")

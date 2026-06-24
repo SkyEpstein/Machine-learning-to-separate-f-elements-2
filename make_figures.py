@@ -96,6 +96,21 @@ if rows:
     ax[0].axhline(0.9,ls='--',c='#1F4E79',lw=1); ax[0].axhline(0.8,ls='--',c='#7FA6CC',lw=1); ax[0].set_xticks(x); ax[0].set_xticklabels(labs); ax[0].set_ylabel('empirical coverage'); ax[0].set_title('Conformal coverage vs target'); ax[0].legend(); ax[0].set_ylim(0,1)
     ax[1].bar(labs,[r[3] for r in rows],color='#B5402E'); ax[1].set_ylabel('median 90% interval width (log units)'); ax[1].set_title('Interval width')
     finish(fig, 'conformal_calibration')
+# coverage illustration: sampled 90% intervals against the true value
+if os.path.exists("deploy_B_condition_predictions.csv"):
+    from matplotlib.lines import Line2D
+    d = pd.read_csv("deploy_B_condition_predictions.csv").sample(30, random_state=1).sort_values('Actual_LogD').reset_index(drop=True)
+    ins = ((d['Actual_LogD'] >= d['lo90']) & (d['Actual_LogD'] <= d['hi90'])).values
+    fig, ax = plt.subplots(figsize=(9, 5.4))
+    for i in range(len(d)):
+        c = '#2E8B57' if ins[i] else '#C0392B'
+        ax.plot([d['lo90'][i], d['hi90'][i]], [i, i], color=c, lw=2, alpha=0.55)
+        ax.plot(d['Actual_LogD'][i], i, 'o', color=c, ms=5)
+    ax.legend([Line2D([0], [0], color='#2E8B57', marker='o', lw=2), Line2D([0], [0], color='#C0392B', marker='o', lw=2)],
+              ['true value inside the 90% range', 'true value outside'], loc='lower right', fontsize=9)
+    ax.set_yticks([]); ax.set_xlabel('logD'); ax.set_ylabel('30 example predictions')
+    ax.set_title(f"Each line is a prediction's 90% range; the dot is the true value\n{int(ins.sum())} of {len(d)} land inside ({ins.mean()*100:.0f}%), matching the 90% target")
+    finish(fig, 'coverage_illustration')
 
 # 10 Zhang comparison: selective 3-class accuracy vs his flat 0.72
 if os.path.exists("classifier_confidence_results.csv"):
