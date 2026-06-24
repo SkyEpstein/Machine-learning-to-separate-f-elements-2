@@ -1,26 +1,15 @@
-# Raw data is shipped compressed as data.zip; do not commit the unzipped CSVs
-Training_Data_V27.csv
-Testing_Data_V39.csv
-data_quality_annotated.csv
-data_audit_flagged.csv
+# Machine-learning-to-separate-f-elements-2 .gitignore additions
 
-# Row-level prediction files (contain measured logD values)
-deploy_*_predictions.csv
-ensemble_*_predictions.csv
-final_*_predictions.csv
-integrated_*.csv
+# Ignore results directory (generated outputs)
+results/
+results/*
 
-# Cross-validation caches and run logs
-*.npz
-*_run.log
-hp_trials.csv
-
-# Python
+# Ignore Python cache
 __pycache__/
 *.pyc
-.ipynb_checkpoints/
-.venv/
-venv/
 
-# OS
-.DS_Store
+# Ignore temporary office files
+~$*
+
+# Keep figures tracked by default; if you want to ignore figures, uncomment:
+# figures/

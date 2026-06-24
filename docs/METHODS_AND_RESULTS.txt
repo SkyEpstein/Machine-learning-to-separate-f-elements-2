@@ -1,0 +1,43 @@
+# Methods and results (moved to docs/)
+
+Predicting logD for rare-earth solvent extraction
+
+This project uses LLM-assisted coding to build machine-learning models that predict
+how well an extractant separates two f-elements, with logD (the log of the
+distribution coefficient, D) as the predicted target. The inputs include molecular
+descriptors, the SMILES string, molecular fingerprints, and environmental factors
+such as pH and temperature. This document describes the data, the models, the
+confidence method, and the results, and throughout it every result is given with
+both R-squared (R2), for which higher is better, and Root Mean Square Error (RMSE)
+in log units, for which lower is better, so that the two are always read together.
+
+Problem and data
+
+The target is logD across a range of about 17.5 log units, and each row of the
+dataset is a single measurement consisting of an extractant molecule written as a
+SMILES string, a metal, an acid type and concentration, a temperature, an
+extractant concentration, a diluent, and the measured logD, so that the dataset as
+a whole holds 8075 rows that span only 295 distinct extractant molecules and 28
+f-element metals, namely the lanthanides together with Am, Cm, Cf, Np, Pu, Pa, Th,
+and U. Because the number of distinct molecules is so small relative to the number
+of rows, the data supports interpolating across the conditions of a molecule that
+has already been measured far better than it supports extrapolating to a molecule
+that has never been seen, and that asymmetry is what motivates the two-task split
+described below.
+
+Two prediction tasks
+
+The two tasks are kept separate because allowing a single molecule to appear in both
+training and testing inflates the score, which is exactly what happened with an
+earlier single split that read R2 = 0.60 and did not survive once the leakage was
+removed. The first task, Track A, is the screening of a new molecule, and since it
+is evaluated with molecule-grouped cross-validation in which no molecule is allowed
+into both training and testing, its numbers are the honest estimate of how well a
+genuinely new extractant can be predicted. The second task, Track B, is the
+optimization of conditions for a molecule that is already in the dataset, and
+because it is evaluated with random-row cross-validation, in which a molecule may
+appear at some conditions in training and at other conditions in the test fold, it
+measures interpolation across conditions and is the model used for tuning the
+operating conditions and predicting separations of the extractants already in use.
+
+(Data truncated here for brevity. The original METHODS_AND_RESULTS.txt is preserved in the repository.)
