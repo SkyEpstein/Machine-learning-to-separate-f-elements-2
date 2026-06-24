@@ -1,1 +1,0 @@
-This file has been moved to docs/archive/METHODS_AND_RESULTS.txt. See METHODS_AND_RESULTS.md for the canonical write-up.

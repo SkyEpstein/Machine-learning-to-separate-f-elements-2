@@ -1,3 +1,0 @@
-model,our_split_CV,his_split_holdout
-our model (LightGBM),0.657,0.692
-his model (XGBoost),0.648,0.68
