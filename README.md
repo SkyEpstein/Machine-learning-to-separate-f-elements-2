@@ -2,6 +2,20 @@
 
 This project uses LLM-assisted coding to predict how well a certain extractant will work to separate two f-elements. Inputs include molecular descriptors, SMILES, molecular fingerprints, and environmental factors (e.g. pH and temperature), with the target output being logD (The log of the distribution coefficient, D).
 
+## Dataset features and why they are used
+
+The model sees four kinds of input, and each one was included because it drives part of the extraction chemistry.
+
+**Extractant structure.** The extractant is given as a SMILES string, from which the code computes a Morgan fingerprint (which substructures are present), a block of RDKit molecular descriptors (size, shape, lipophilicity, and ring and functional-group counts), and a few simple ligand descriptors (the counts of oxygen, nitrogen, sulfur, and phosphorus donor atoms, plus the calculated logP). These describe how the extractant can bind a metal, since the donor atoms and the surrounding structure set the strength and the selectivity of that binding.
+
+**Metal descriptors.** Each metal is described by numeric properties rather than just its name: atomic number, ionic radius, oxidation state, metallic radius, the first three ionization energies, Pauling electronegativity, density, melting and boiling points, and the metal concentration. These matter because the ionic radius and the charge drive the lanthanide-contraction trend that makes neighboring rare earths so chemically similar, and giving the model these numbers lets it relate one metal to another along that trend, which a one-hot label cannot do.
+
+**Acid and process conditions.** The acid type and concentration, the temperature, the extractant concentration, and the diluent volume fractions are included because logD is an equilibrium quantity: it shifts with acid concentration and with extractant concentration and with pH, so the conditions are as important as the molecule itself.
+
+**Diluent (solvent) descriptors.** The two diluent components are described by molar mass, logP, boiling and melting points, density, water solubility, and dipole moment, because the diluent sets the organic-phase environment and affects how the extractant aggregates and how well it pulls the metal into the organic phase.
+
+For new molecules (Track A) the structure does not generalize from only about 300 distinct extractants, so that model leans on the conditions and the metal descriptors. For known molecules (Track B) the fingerprint and the ligand descriptors are added and do help, because the molecule has already been seen at other conditions.
+
 ## Summary of the two tracks
 - **Track A (screening new molecules)**
   - Evaluated with molecule-grouped cross-validation (no molecule is in both training and test folds).
