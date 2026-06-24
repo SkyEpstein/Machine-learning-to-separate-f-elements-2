@@ -5,7 +5,9 @@ case). For two metals at the same extractant and conditions, compare the predict
 logD difference against the actual one. Direction does not matter here (whichever
 metal is left in solution can be taken with a known extractant); what matters is the
 separation magnitude. Reports how well |pred diff| tracks |actual diff|, and the
-fraction of pairs where |pred diff| >= |actual diff|, overall and by confidence.
+fraction of pairs where |pred diff| <= |actual diff| (the predict-under criterion:
+the model's predicted separation is conservative, so the real gap is at least as
+large), overall and by confidence.
 Uses the Track A deployable predictions (molecule-grouped, new molecule).
 """
 import warnings; warnings.filterwarnings('ignore')
@@ -27,13 +29,13 @@ dp = np.array(dp); da = np.array(da); pconf = np.array(pconf)
 adp, ada = np.abs(dp), np.abs(da)
 print(f"=== TRACK A separation (new molecules): {len(dp)} metal pairs at identical conditions ===")
 print(f"  magnitude |pred diff| vs |actual diff|: R2={r2_score(ada, adp):.3f}  RMSE={rmse(ada, adp):.3f}")
-print(f"  fraction with |pred diff| >= |actual diff| (your criterion):")
+print(f"  fraction with |pred diff| <= |actual diff| (predict-under criterion):")
 rows = []
 for q in [100, 50, 25, 10]:
     m = np.ones(len(dp), bool) if q == 100 else (pconf <= np.percentile(pconf, q))
-    frac = (adp[m] >= ada[m]).mean()
+    frac = (adp[m] <= ada[m]).mean()
     print(f"     {'all pairs' if q==100 else f'most confident {q}%':<18s}: {frac:.3f}   (n={int(m.sum())})")
-    rows.append({'subset': 'all' if q == 100 else f'top{q}_conf', 'n': int(m.sum()), 'frac_pred_ge_actual': round(float(frac), 3)})
+    rows.append({'subset': 'all' if q == 100 else f'top{q}_conf', 'n': int(m.sum()), 'frac_pred_le_actual': round(float(frac), 3)})
 print(f"  for context, mean |actual diff| = {ada.mean():.2f}, mean |pred diff| = {adp.mean():.2f} (model under-predicts if pred mean is smaller)")
 pd.DataFrame(rows).to_csv("track_a_separation_results.csv", index=False)
 print("saved track_a_separation_results.csv")
