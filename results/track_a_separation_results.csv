@@ -1,0 +1,5 @@
+subset,n,frac_pred_ge_actual
+all,44894,0.433
+top50_conf,22585,0.456
+top25_conf,11280,0.459
+top10_conf,4601,0.514
