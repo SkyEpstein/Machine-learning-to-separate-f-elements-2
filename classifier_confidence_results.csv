@@ -1,0 +1,5 @@
+track,task,accuracy,macro_F1,top25_acc,top10_acc
+Track A new-molecule (Zhang analog),3-class,0.625,0.619,0.854,0.912
+Track A new-molecule (Zhang analog),binary logD>0,0.742,0.817,0.896,0.962
+Track B known-molecule,3-class,0.753,0.752,0.956,0.983
+Track B known-molecule,binary logD>0,0.832,0.91,0.973,0.982
