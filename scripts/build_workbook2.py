@@ -205,5 +205,12 @@ if os.path.exists("ucb_analysis_results.csv"):
         uc.values.tolist(), [22, 12, 22, 16, 18],
         note="Ranking candidate combinations to test. UCB is the upper end of the 90 percent conformal interval (prediction plus uncertainty). For one-shot screening, ranking by the plain prediction (greedy) finds the strongest extractants and beats UCB, because the uncertainty bonus pulls in uncertain but mediocre candidates. UCB's role is sequential active learning, where exploring uncertain candidates improves the model over rounds. The top 5 percent by prediction reach mean actual logD near 2.2 (new) to 2.6 (known) against 0.02 over all rows.")
 
+if os.path.exists("active_learning_results.csv"):
+    al = pd.read_csv("active_learning_results.csv")[["strategy", "final_test_R2", "final_discovery"]]
+    sheet("Active learning (sequential)",
+        ["Strategy", "Final test R2 (model quality)", "Final discovery (share of true top-10% found)"],
+        al.values.tolist(), [22, 30, 40],
+        note="Sequential active learning: each round picks the next batch to run, reveals logD, and retrains. For finding strong extractants (discovery) greedy and UCB win, about 0.72 of the true best found. For improving the model (test R2) uncertainty sampling wins at 0.56, while greedy and UCB hurt it by over-sampling the high-logD region and biasing the training set. UCB tracks greedy here, so the best acquisition depends on whether the goal is discovery or model improvement.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)
