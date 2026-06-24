@@ -1,2 +1,0 @@
-model,task,accuracy_all,macro_F1,top25_acc,top10_acc
-Zhang XGBoost + our confidence,3-class,0.605,0.598,0.847,0.914

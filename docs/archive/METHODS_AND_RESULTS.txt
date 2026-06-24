@@ -1,0 +1,3 @@
+Predicting logD for rare-earth solvent extraction
+
+This long write-up has been archived (originally METHODS_AND_RESULTS.txt) and the canonical markdown version is METHODS_AND_RESULTS.md in the repo root.
