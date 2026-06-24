@@ -170,6 +170,26 @@ sheet("Sign and Separation",
     [42, 18, 8, 13, 13, 44],
     note="Sign correctness is the fraction where predicted logD has the same sign as actual (extract or not). Separation compares predicted versus actual logD difference between two metals at the same conditions. The predict-under rate is how often the predicted separation magnitude is at most the actual one, meaning the model is conservative about selectivity.")
 
+sheet("Decision Log",
+    ["Decision", "What we chose", "Why"],
+    [
+    ["Two prediction tasks", "Separate new-molecule (A) from known-molecule (B)", "Mixing them lets a molecule leak across train and test and inflates the score; an earlier single split read 0.60 and did not hold up."],
+    ["Evaluation", "Molecule-grouped CV for A, random-row CV for B", "Each matches a real use case (screen a new extractant vs tune a known one) without leakage."],
+    ["Data cleaning", "Drop exact duplicates and replicate groups disagreeing by more than 2 log units", "Contradictory labels are noise; cleaning took 8075 rows to 7065."],
+    ["Track A model", "Single tuned LightGBM", "The stack adds accuracy but makes residuals less rankable, which weakens confidence; the single model ranks confidence better for screening."],
+    ["Track B model", "NNLS stack of trees (ExtraTrees, LightGBM, XGBoost, CatBoost)", "Stacking improves both accuracy and confidence here, and NNLS sets weak members to zero on its own."],
+    ["Features", "A: conditions + metal; B: also ECFP + ligand", "Structure does not generalize from about 300 molecules (A); it helps once the molecule has been seen (B). RDKit blocks and embeddings did not beat ECFP plus conditions."],
+    ["Confidence", "err_lgb on plain features, ranked; normalized split-conformal intervals", "Richer features (member predictions, disagreement, novelty) ranked worse; the intervals hit their target coverage (0.89 to 0.90)."],
+    ["Graph network", "Dropped", "Chemprop alone reached only R2 0.23 on new molecules and added nothing when blended."],
+    ["TabPFN", "Dropped", "As a local expert it earned only 0.13 NNLS weight and +0.0011 R2, with error-correlation 0.82 to the trees (not diverse)."],
+    ["Hyperparameter search", "Kept near-default settings", "A randomized search moved Track A 0.466 to 0.484 and Track B not at all."],
+    ["Separation criterion", "Predict-under: predicted gap at most the actual gap", "Direction does not matter since the other metal stays in solution for a known extractant; a conservative predicted gap means the real gap is at least as large."],
+    ["Active analysis", "Rank by prediction for one-shot screening; UCB for sequential rounds", "UCB's uncertainty bonus pulls in mediocre candidates, so greedy finds the strongest now; UCB pays off only when exploring to improve the model over rounds."],
+    ["Comparison with Dr. Zhang", "Same 8075-row dataset, scored on his split", "Our model matches his accuracy on his own test; the added value is continuous logD with calibrated confidence rather than one of three buckets."],
+    ],
+    [26, 40, 66],
+    note="Every major modeling choice and the reason for it, so the project is documented as it evolved.")
+
 import os
 if os.path.exists("classifier_confidence_results.csv"):
     cc = pd.read_csv("classifier_confidence_results.csv")
