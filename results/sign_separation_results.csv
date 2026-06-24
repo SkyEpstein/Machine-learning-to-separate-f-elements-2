@@ -1,0 +1,4 @@
+analysis,track,all,top25_conf,top10_conf
+sign match,Track A (new molecule),0.743,0.855,0.903
+sign match,Track B (known molecule),0.836,0.913,0.919
+separation,Track B pairs,signed R2 0.582,dir correct 0.763,|pred|>|actual| 0.367
