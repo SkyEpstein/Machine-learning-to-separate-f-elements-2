@@ -212,5 +212,14 @@ if os.path.exists("active_learning_results.csv"):
         al.values.tolist(), [22, 30, 40],
         note="Sequential active learning: each round picks the next batch to run, reveals logD, and retrains. For finding strong extractants (discovery) greedy and UCB win, about 0.72 of the true best found. For improving the model (test R2) uncertainty sampling wins at 0.56, while greedy and UCB hurt it by over-sampling the high-logD region and biasing the training set. UCB tracks greedy here, so the best acquisition depends on whether the goal is discovery or model improvement.")
 
+if os.path.exists("experiment_triage_results.csv"):
+    et = pd.read_csv("experiment_triage_results.csv")
+    et['accepted_within_0p5'] = (et['accepted_within_0p5'] * 100).round(0).astype(int).astype(str) + '%'
+    sheet("Experiment triage",
+        ["Track", "Auto-accept most confident %", "Experiments saved", "Experiments still needed", "Accepted RMSE", "Accepted within 0.5 log units"],
+        et[['track', 'auto_accept_pct', 'experiments_saved', 'experiments_needed', 'accepted_RMSE', 'accepted_within_0p5']].values.tolist(),
+        [22, 26, 16, 20, 12, 22],
+        note="The high-confidence predictions do not need experiments; they are trusted as-is, so the experiment budget goes to the uncertain remainder. For known molecules the most confident half can be accepted at RMSE 0.535 with 75 percent within half a log unit, which halves the experiments needed. New molecules degrade faster, so a smaller, more confident slice is accepted. For the experiments that are run, sampling by uncertainty improves the model fastest.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)

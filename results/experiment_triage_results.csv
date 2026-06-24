@@ -1,0 +1,7 @@
+track,auto_accept_pct,experiments_saved,experiments_needed,accepted_RMSE,accepted_within_0p5
+Track A (new molecule),25,1767,5298,0.642,0.699
+Track A (new molecule),50,3535,3530,0.812,0.588
+Track A (new molecule),75,5299,1766,0.943,0.508
+Track B (known molecule),25,1767,5298,0.424,0.847
+Track B (known molecule),50,3535,3530,0.535,0.746
+Track B (known molecule),75,5299,1766,0.631,0.672
