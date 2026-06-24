@@ -1,4 +1,4 @@
-Machine learning for f-element separation
+# Machine learning for f-element separation
 
 This project uses LLM-assisted coding to predict how well a certain extractant will
 work to separate two f-elements. Inputted values include molecular descriptors,
@@ -17,7 +17,7 @@ RMSE 0.823 overall, or R² 0.940 and RMSE 0.341 on its most confident 10%. The t
 kept apart because a molecule in both sets inflates the score, and an earlier split
 that mixed them read 0.60 and did not hold up.
 
-Scripts:
+## Scripts:
   confidence_tune.py        cross-validated predictions and the confidence comparison.
   deploy_final.py           builds the two final models and writes their predictions.
   ensemble_final.py         the full Track B stack with confidence.
@@ -32,26 +32,26 @@ Scripts:
   build_workbook2.py        builds the results spreadsheet.
   build_slides.py           builds the slide deck.
 
-Outputs:
+## Outputs:
   REE_Results_Organized.xlsx   the results spreadsheet.
   REE_Results_Slides.pptx      the slide deck.
   figures/                     the figures, plus all_figures.pdf.
   METHODS_AND_RESULTS.txt      the full write-up.
   the *_results.csv files      per-metal, per-pair, classifier, and Zhang result tables.
 
-To run:
+## To run:
   pip install -r requirements.txt
   unzip data.zip
 Then run the scripts in the order listed above. The Zhang comparison scripts also
 need his data files from his repository.
 
-Data:
+## Data:
 The dataset is shipped compressed as data.zip. Unzip it first with "unzip data.zip",
 which produces Training_Data_V27.csv (training and validation) and
 Testing_Data_V39.csv (held-out test). The per-row prediction files are left out
 because they are just model outputs.
 
-How the confidence works:
+## How the confidence works:
 A second model is trained to guess how far off each prediction will be, and the
 predictions are ranked by that guess, so the most confident ones are much more
 accurate than the rest. The intervals are scaled by the same guess and tuned to hit
