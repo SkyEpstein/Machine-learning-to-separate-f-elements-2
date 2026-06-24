@@ -210,7 +210,7 @@ if os.path.exists("active_learning_results.csv"):
     sheet("Active learning (sequential)",
         ["Strategy", "Final test R2 (model quality)", "Final discovery (share of true top-10% found)"],
         al.values.tolist(), [22, 30, 40],
-        note="Sequential active learning: each round picks the next batch to run, reveals logD, and retrains. For finding strong extractants (discovery) greedy and UCB win, about 0.72 of the true best found. For improving the model (test R2) uncertainty sampling wins at 0.56, while greedy and UCB hurt it by over-sampling the high-logD region and biasing the training set. UCB tracks greedy here, so the best acquisition depends on whether the goal is discovery or model improvement.")
+        note="Sequential active learning: each round picks the next batch to run, reveals logD, and retrains. For finding strong extractants (discovery) greedy and UCB win, about 0.72 of the true best found. For improving the model (test R2) the ensemble-disagreement uncertainty wins at 0.56. Acquiring by the confidence algorithm's own predicted error, the same err model used to decide which predictions to trust, helps discovery (0.44) but improves the model less (0.465), because large predicted error flags the hard, extreme-logD points rather than under-sampled regions, which biases the training set much as greedy does. So the err model is the right tool for deciding which predictions to trust, while ensemble disagreement is the right signal for choosing points that most improve the model.")
 
 if os.path.exists("experiment_triage_results.csv"):
     et = pd.read_csv("experiment_triage_results.csv")

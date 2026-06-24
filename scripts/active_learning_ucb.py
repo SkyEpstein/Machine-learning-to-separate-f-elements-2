@@ -6,15 +6,19 @@ an acquisition rule, reveal their logD, retrain, and repeat. This is where UCB
 (prediction + uncertainty) is supposed to help, unlike the one-shot screen.
 
 Strategies compared each round (same seed set, fair): random, greedy (pick highest
-predicted logD), UCB (predicted + 1.0 * uncertainty), and pure uncertainty.
-Uncertainty is the spread across a 5-model bagged LightGBM. Two outcomes are
-tracked over rounds: model quality (R^2 on a fixed held-out test set) and discovery
-(how much of the pool's true top-10% strongest extractants has been found).
-Conditions + metal features (the new-molecule screening setting).
+predicted logD), UCB (predicted + 1.0 * uncertainty), pure uncertainty (the spread
+across a 5-model bagged LightGBM), and confidence (the learned err model that
+predicts each point's absolute error, the same confidence algorithm used in the
+deployed models, fit on within-labeled out-of-fold residuals each round and used to
+acquire the points it flags as most uncertain). Two outcomes are tracked over
+rounds: model quality (R^2 on a fixed held-out test set) and discovery (how much of
+the pool's true top-10% strongest extractants has been found). Conditions + metal
+features (the new-molecule screening setting).
 """
 import os, time, warnings; os.environ.setdefault('KMP_DUPLICATE_LIB_OK', 'TRUE'); warnings.filterwarnings('ignore')
 import numpy as np, pandas as pd
 from sklearn.metrics import r2_score
+from sklearn.model_selection import KFold
 import lightgbm as lgb
 from PIL import Image
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
@@ -43,6 +47,13 @@ test = idx[:TEST_N]; pool = idx[TEST_N:]; seed0 = pool[:SEED_N]
 truebest = set(pool[np.argsort(-y[pool])[:int(0.10 * len(pool))]].tolist())
 def bag(Xtr, ytr):
     return [lgb.LGBMRegressor(n_estimators=400, learning_rate=0.05, num_leaves=63, subsample=0.7, colsample_bytree=0.7, subsample_freq=1, random_state=s, n_jobs=-1, verbosity=-1).fit(Xtr, ytr) for s in range(KBAG)]
+def conf_err(Xl, yl, Xu):
+    """The confidence algorithm: out-of-fold residuals on the labeled set train an err model that predicts absolute error, then score the unlabeled pool by predicted error."""
+    oof = np.zeros(len(yl))
+    for ti, vi in KFold(3, shuffle=True, random_state=0).split(Xl):
+        mm = lgb.LGBMRegressor(n_estimators=300, learning_rate=0.05, num_leaves=63, random_state=0, n_jobs=-1, verbosity=-1).fit(Xl[ti], yl[ti]); oof[vi] = mm.predict(Xl[vi])
+    em = lgb.LGBMRegressor(n_estimators=300, learning_rate=0.05, num_leaves=31, random_state=0, n_jobs=-1, verbosity=-1).fit(Xl, np.abs(yl - oof))
+    return em.predict(Xu)
 def run(strategy):
     lab = list(seed0); unlab = [i for i in pool if i not in set(seed0)]; r2s, recs = [], []
     arng = np.random.RandomState(0)
@@ -52,11 +63,11 @@ def run(strategy):
         recs.append(len(set(lab) & truebest) / len(truebest))
         if not unlab: break
         ua = np.array(unlab); preds = np.array([m.predict(X[ua]) for m in models]); mu = preds.mean(0); sd = preds.std(0)
-        score = {'random': arng.rand(len(ua)), 'greedy': mu, 'ucb': mu + 1.0 * sd, 'uncertainty': sd}[strategy]
+        score = conf_err(X[lab], y[lab], X[ua]) if strategy == 'confidence' else {'random': arng.rand(len(ua)), 'greedy': mu, 'ucb': mu + 1.0 * sd, 'uncertainty': sd}[strategy]
         pick = ua[np.argsort(-score)[:BATCH]]
         lab += pick.tolist(); pks = set(pick.tolist()); unlab = [i for i in unlab if i not in pks]
     return r2s, recs
-res = {s: run(s) for s in ['random', 'greedy', 'ucb', 'uncertainty']}
+res = {s: run(s) for s in ['random', 'greedy', 'ucb', 'uncertainty', 'confidence']}
 print(f"sequential active learning | pool {len(pool)}, seed {SEED_N}, +{BATCH}/round x {ROUNDS}, test {TEST_N}")
 print(f"\n{'strategy':<12} {'final test R2':>13} {'final discovery':>16}  (discovery = share of the pool's true top-10% found)")
 rows = []
@@ -65,7 +76,7 @@ for s, (r2s, recs) in res.items():
     rows.append({'strategy': s, 'final_test_R2': round(r2s[-1], 3), 'final_discovery': round(recs[-1], 3), 'R2_by_round': ';'.join(f'{v:.3f}' for v in r2s), 'discovery_by_round': ';'.join(f'{v:.3f}' for v in recs)})
 pd.DataFrame(rows).to_csv("active_learning_results.csv", index=False)
 fig, ax = plt.subplots(1, 2, figsize=(12, 4.5))
-xr = range(1, ROUNDS + 1); col = {'random': '#999999', 'greedy': '#B5402E', 'ucb': '#1F4E79', 'uncertainty': '#2E8B57'}
+xr = range(1, ROUNDS + 1); col = {'random': '#999999', 'greedy': '#B5402E', 'ucb': '#1F4E79', 'uncertainty': '#2E8B57', 'confidence': '#8E44AD'}
 for s, (r2s, recs) in res.items():
     ax[0].plot(xr, r2s, marker='o', ms=3, label=s, color=col[s]); ax[1].plot(xr, recs, marker='o', ms=3, label=s, color=col[s])
 ax[0].set_xlabel('round'); ax[0].set_ylabel('test R-squared'); ax[0].set_title('Model quality over rounds'); ax[0].legend(fontsize=8)
