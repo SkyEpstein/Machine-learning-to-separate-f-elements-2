@@ -1,201 +1,100 @@
-Predicting logD for rare-earth solvent extraction
+# Predicting logD for rare-earth solvent extraction
 
-This project uses LLM-assisted coding to build machine-learning models that predict
-how well an extractant separates two f-elements, with logD (the log of the
-distribution coefficient, D) as the predicted target. The inputs include molecular
-descriptors, the SMILES string, molecular fingerprints, and environmental factors
-such as pH and temperature. This document describes the data, the models, the
-confidence method, and the results, and throughout it every result is given with
-both R-squared (R2), for which higher is better, and Root Mean Square Error (RMSE)
-in log units, for which lower is better, so that the two are always read together.
+This document describes the data, models, confidence method, and results. Metrics reported are R² (higher is better) and RMSE in log units (lower is better).
 
-Problem and data
+## Problem and data
+- Target: logD across ~17.5 log units.  
+- Dataset: 8,075 raw rows spanning 295 distinct extractant molecules and 28 f-element metals (lanthanides plus Am, Cm, Cf, Np, Pu, Pa, Th, U).  
+- Each row: SMILES string, metal, acid type & concentration, temperature, extractant concentration, diluent, measured logD.
 
-The target is logD across a range of about 17.5 log units, and each row of the
-dataset is a single measurement consisting of an extractant molecule written as a
-SMILES string, a metal, an acid type and concentration, a temperature, an
-extractant concentration, a diluent, and the measured logD, so that the dataset as
-a whole holds 8075 rows that span only 295 distinct extractant molecules and 28
-f-element metals, namely the lanthanides together with Am, Cm, Cf, Np, Pu, Pa, Th,
-and U. Because the number of distinct molecules is so small relative to the number
-of rows, the data supports interpolating across the conditions of a molecule that
-has already been measured far better than it supports extrapolating to a molecule
-that has never been seen, and that asymmetry is what motivates the two-task split
-described below.
+Because the dataset contains relatively few distinct molecules (295), interpolation for known molecules is easier than extrapolating to new molecules; this motivates the two-track evaluation below.
 
-Two prediction tasks
+## Two prediction tasks
+- **Track A (new-molecule screening):** molecule-grouped cross-validation (no molecule in both training and test). Measures generalization to genuinely new extractants.
+- **Track B (condition optimization for known molecules):** random-row cross-validation (same molecule may appear in train and test at different conditions). Measures interpolation across conditions.
 
-The two tasks are kept separate because allowing a single molecule to appear in both
-training and testing inflates the score, which is exactly what happened with an
-earlier single split that read R2 = 0.60 and did not survive once the leakage was
-removed. The first task, Track A, is the screening of a new molecule, and since it
-is evaluated with molecule-grouped cross-validation in which no molecule is allowed
-into both training and testing, its numbers are the honest estimate of how well a
-genuinely new extractant can be predicted. The second task, Track B, is the
-optimization of conditions for a molecule that is already in the dataset, and
-because it is evaluated with random-row cross-validation, in which a molecule may
-appear at some conditions in training and at other conditions in the test fold, it
-measures interpolation across conditions and is the model used for tuning the
-operating conditions and predicting separations of the extractants already in use.
+Keeping the tasks separate avoids leakage that inflates performance (an earlier single split reported R² = 0.60 but did not hold up when leakage was removed).
 
-Data cleaning
+## Data cleaning
+- Remove exact duplicate rows.
+- Remove any replicate group (same molecule, metal, conditions) whose logD spans > 2 log units (contradictory labels).
+- Cleaning reduces rows from 8,075 to 7,065.
+- Replicate scatter sets a noise floor near RMSE ≈ 0.77 on raw data.
 
-Two automated steps were applied before modeling, both of them independent of the
-model itself, in that exact duplicate rows were dropped and any replicate group
-(the same molecule, metal, and conditions) whose logD spanned more than 2 log units
-was removed because such labels contradict one another, and these two steps reduced
-the data from 8075 rows to 7065, while the scatter within replicate groups sets a
-noise floor near RMSE 0.77 on the raw data that bounds how low any model's error
-can go.
+## Features
+- Track A: conditions and metal descriptors only (molecular structure did not help for genuinely new molecules).
+- Track B: conditions, ECFP fingerprint, and a few simple ligand descriptors. RDKit descriptor blocks and pretrained embeddings were tested but did not outperform ECFP+conditions.
 
-Features
+## Models
+Tested models: LightGBM, XGBoost, CatBoost, HistGradientBoosting, ExtraTrees, ridge regression, a small neural network, a Chemprop graph network, and TabPFN.
 
-Track A uses the conditions and the metal descriptors only, because adding the
-molecular structure did not help once the molecule was genuinely new, whereas Track
-B uses the conditions together with an ECFP fingerprint and a few simple ligand
-descriptors, and although RDKit descriptor blocks and pretrained embeddings were
-both tested, neither beat the combination of ECFP and conditions, so they were
-dropped.
+- Track A: single tuned LightGBM chosen (better residual predictability for confidence).
+- Track B: NNLS stack of tree models. NNLS sets non-helpful model weights to zero; final weights: ExtraTrees 0.43, LightGBM 0.40, XGBoost 0.14, CatBoost 0.03.
+- Graph network: R² ≈ 0.23 on new molecules — added nothing in blends.
+- Global TabPFN (CPU-limited to 1000 context rows): R² ≈ 0.36 by itself.
 
-Models
+## Confidence and uncertainty
+- A second model predicts absolute error for each prediction using conditions and the prediction itself.
+- Rows ranked by predicted error; most confident predictions are far more accurate.
+- Uncertainty intervals from normalized split-conformal: interval width scales with predicted error and is calibrated to target coverage (90% and 80% targets), matching measured coverage.
 
-The models that were tested include LightGBM, XGBoost, CatBoost,
-HistGradientBoosting, ExtraTrees, ridge regression, a small neural network, a
-Chemprop graph network, and TabPFN, and from among these Track A was settled on a
-single tuned LightGBM, while Track B uses a non-negative least squares (NNLS) stack
-of the tree models, which is useful because NNLS sets the weight of any member that
-does not improve the blend to zero and therefore drops the weak models on its own,
-leaving on Track B the weights ExtraTrees 0.43, LightGBM 0.40, XGBoost 0.14, and
-CatBoost 0.03. The stack raises accuracy on both tracks, but on Track A it also
-makes the residuals less predictable and so weakens the confidence ranking, which
-is why the single model is preferred there, whereas on Track B the stack improves
-both the accuracy and the confidence and is therefore used. The graph network on its
-own reached only R2 = 0.23 on new molecules and added nothing once blended, and a
-single global TabPFN, which is capped at 1000 context rows on a CPU, reached only
-about R2 = 0.36 by itself.
+## Results
 
-Confidence and uncertainty
+### Track A (new molecules, LightGBM, molecule-grouped CV)
+- All rows: R² = 0.466, RMSE = 1.148  
+- Most confident 50%: R² = 0.719, RMSE = 0.812  
+- Most confident 25%: R² = 0.825, RMSE = 0.642  
+- Most confident 10%: R² = 0.912, RMSE = 0.493  
+- Conformal intervals: measured coverage ≈ 0.89 (target 90%), median width = 3.61 log units
 
-The confidence signal is a second model that predicts the absolute error of each
-prediction from the conditions and the prediction itself, and because the rows are
-then ranked by that predicted error from lowest to highest, the most confident
-predictions turn out to be far more accurate than the full set; richer feature sets
-that added the member predictions, their disagreement, and a novelty score were
-tried but ranked worse, so the plain recipe was kept. The uncertainty intervals are
-produced by normalized split-conformal, in which the width of an interval scales
-with the predicted error and is calibrated to a 90 and an 80 percent target, and the
-measured coverage matched those targets.
+### Track B (known molecules, NNLS tree stack, random-row CV)
+- All rows: R² = 0.725, RMSE = 0.823  
+- Most confident 50%: R² = 0.871, RMSE = 0.535  
+- Most confident 25%: R² = 0.911, RMSE = 0.424  
+- Most confident 10%: R² = 0.940, RMSE = 0.341  
+- Conformal coverage: 0.90 at 90% target, median width = 2.34 log units
 
-Results
+Track B improves on an earlier best known-molecule test RMSE near 0.96.
 
-On Track A, the screening of new molecules with the single LightGBM under
-molecule-grouped cross-validation, the model reaches R2 = 0.466 and RMSE = 1.148
-across all rows, and as the rows are filtered down by confidence the accuracy rises
-steadily to R2 = 0.719 and RMSE = 0.812 over the most confident half, R2 = 0.825 and
-RMSE = 0.642 over the most confident quarter, and R2 = 0.912 and RMSE = 0.493 over
-the most confident tenth, while the conformal intervals reach 0.89 coverage against
-a 90 percent target with a median width of 3.61 log units. On Track B, the
-condition optimization with the NNLS stack under random-row cross-validation, the
-model reaches R2 = 0.725 and RMSE = 0.823 across all rows and rises with confidence
-to R2 = 0.871 and RMSE = 0.535 over the most confident half, R2 = 0.911 and
-RMSE = 0.424 over the most confident quarter, and R2 = 0.940 and RMSE = 0.341 over
-the most confident tenth, with conformal coverage of 0.90 at the 90 percent target
-and a median width of 2.34 log units, and since the earlier experiment log reached a
-best known-molecule test RMSE near 0.96, Track B at RMSE = 0.823 is a clear
-improvement on it.
+## Confidence by metal and metal pair
+- Strongest metals (Track B): Am(III) R² = 0.801, RMSE = 0.656 (n=1121); Cm(III) R² = 0.784, RMSE = 0.436.  
+- Weakest: Er(III) R² = 0.391, RMSE = 1.392; Np(V) R² = 0.053, RMSE = 1.027; U(VI) R² = 0.314, RMSE = 1.062.  
+- Because predicted error tracks observed RMSE, the model flags metals it predicts poorly.  
+- Separation (difference in logD between two metals at same conditions): overall R² = 0.599, RMSE = 1.025. Pairs far apart in logD (e.g. Dy/Yb) predicted well; adjacent pairs (e.g. Er/Tb) are harder.
 
-Confidence by metal and by metal pair
+## TabPFN experiment
+- Tried local TabPFN experts per cluster (to stay within context limit), then NNLS to weight them.
+- With 6 regions and 3 folds, TabPFN got NNLS weight 0.13 but raised R² by only +0.0011; error-correlation with tree stack = 0.82. Not diverse enough, so dropped.
 
-When the Track B results are broken down by metal, the model is strongest on Am(III),
-where it reaches R2 = 0.801 and RMSE = 0.656 over 1121 rows, and on Cm(III), where it
-reaches R2 = 0.784 and RMSE = 0.436, and it is weakest on Er(III) at R2 = 0.391 and
-RMSE = 1.392, on Np(V) at R2 = 0.053 and RMSE = 1.027, and on U(VI) at R2 = 0.314
-and RMSE = 1.062, but because the confidence error tracks these RMSE values, the
-model flags the metals it predicts poorly rather than failing silently on them. When
-the predictions are turned into separations by taking the difference in logD between
-two metals at the same conditions, the overall separation reaches R2 = 0.599 and
-RMSE = 1.025, and while pairs that are far apart in logD such as Dy/Yb are predicted
-well at R2 = 0.810, the tight adjacent pairs such as Er/Tb are the hardest, sitting
-near R2 = 0 with RMSE = 2.53, which is precisely where the confidence error is
-highest.
+## Comparison to Dr. Zhang's model (SAFE-MolGen)
+- Dr. Zhang: LLM-generated candidate extractants + supervised XGBoost classifier fit on 8,075 rows with 1,860 features (Morgan fingerprints + conditions). Reported 72% accuracy on a 3-class task for logD binning.
+- This project and Zhang likely use the same integrated dataset (ACSEPT, DGA, IDEaL, ORNL).
+- When our regression is binned to his 3-class thresholds (0.5 and 10) on Track A new molecules: accuracy = 0.623, macro-F1 = 0.619 (rising with confidence to 0.847 on the most confident 10%).
+- Reproducing his XGBoost classifier under molecule-grouped CV scored 0.605 (below his reported 0.72), suggesting his single 494-row holdout and class imbalance explain some of the difference.
+- Adding the confidence layer to his XGBoost lifts the confident tenth to 0.914 and the quarter to 0.847; the binary extract screen ROC AUC = 0.798.
 
-TabPFN experiment
+## Classifiers with confidence
+- Native 3-class and binary classifiers were trained (with confidence = predicted probability of chosen class).
+- Track A (new molecules):
+  - 3-class: 0.625 overall; 0.766/0.854/0.912 on most confident 50%/25%/10%
+  - Binary (logD > 0): 0.742 accuracy, ROC AUC = 0.817; rises to 0.962 on most confident 10%
+- Track B (known molecules):
+  - 3-class: 0.753 overall; 0.906/0.956/0.983 on most confident 50%/25%/10%
+  - Binary: 0.832 accuracy; ROC AUC = 0.910
 
-The idea behind the TabPFN experiment was to use many local TabPFN experts, one per
-cluster of similar rows so that each cluster stays within TabPFN's context limit,
-and then to let non-negative least squares decide how much weight the TabPFN signal
-should earn next to the tree members, with the rule that TabPFN would be kept only
-if its NNLS weight exceeded 0.03 and it raised R2 by more than 0.002. When this was
-run on Track B with 6 regions and 3 folds, TabPFN did earn an NNLS weight of 0.13,
-but it raised R2 by only +0.0011 over the trees-only stack, moving it from 0.6999 to
-0.7009, and because its error-correlation with the tree stack was 0.82 it was simply
-not diverse enough to add anything, so it was dropped and the deployable Track B
-model stayed the tree stack, a result that fits the broader pattern in this data,
-which is that the strong models are correlated with one another and so the gains
-from stacking are small.
+## Limitations
+- New-molecule accuracy limited by only 295 distinct extractants — more distinct molecules needed to raise Track A performance.
+- Track B bounded by label noise.
+- Comparison to Dr. Zhang close but not exact due to inferred class cut points and possible cleaning differences.
 
-Comparison to Dr. Zhang's model (SAFE-MolGen)
-
-Dr. Zhang's system uses a large language model to generate candidate f-element
-extractants and a supervised model to screen them, and that supervised model is an
-XGBoost classifier, with a cross-validated neural network and a random forest also
-trained, that was fit on 8075 rows with 1860 features made of Morgan fingerprints
-and conditions under a molecule-grouped split, reaching a reported 72 percent
-accuracy on a 3-class task with a macro-F1 of 0.67 and per-class F1 scores of 0.77,
-0.74, and 0.52. Because both datasets have exactly 8075 rows, this work and Dr.
-Zhang's almost certainly use the same integrated f-element dataset assembled from
-ACSEPT, DGA, IDEaL, and ORNL, so the comparison is fair on the data, and the real
-differences are the task type and the test design, in that his model sorts molecules
-into three buckets from one fixed 494-row molecule-held-out test, whereas this work
-predicts a continuous logD with a calibrated uncertainty, evaluates it with
-molecule-grouped cross-validation over all 7065 cleaned rows, and additionally
-optimizes conditions and predicts separations.
-
-When our regression is scored on his 3-class task at distribution coefficients of 0.5 and
-10 for Track A, it reaches 0.623 accuracy with a macro-F1 of 0.619 over all new
-molecules, and rises with confidence to 0.724 over the most confident half, 0.796
-over the most confident quarter, and 0.847 over the most confident tenth, so that
-even though his native classifier is ahead across all molecules at 0.72 against
-0.623, which is expected because he trains a classifier directly while this binning
-starts from a regression, his single number is flat and gives no way to tell which
-predictions to trust, whereas the confidence ranking here matches him on the most
-confident half and reaches 0.847 on the most confident tenth, and on the practical
-binary question of whether a new extractant extracts at all (logD above 0) the model
-reaches 0.745 accuracy on new molecules. A native classifier built for his exact
-task sharpens the comparison further, since it beats 0.72 outright on known
-molecules at 0.753 and reaches 0.912 on the most confident tenth of new molecules.
-
-His model was also reproduced directly, in that an XGBoost 3-class classifier on
-fingerprints and conditions, run under the same molecule-grouped cross-validation,
-scores only 0.605 over all new molecules, which is below his reported 0.72 and about
-equal to the classifiers built here, so the 0.72 reflects his single 494-row holdout
-together with the more imbalanced classes of that holdout rather than a stronger
-model, and the fact that giving the classifier the fingerprints did not beat using
-the conditions alone on new molecules confirms once more that structure does not
-generalize from only 295 molecules. When the confidence layer is added to his own
-XGBoost it lifts the confident tenth to 0.914 and the confident quarter to 0.847,
-and the binary extract screen reaches a ROC AUC of 0.798, which shows that the
-confidence layer is model-agnostic and helps his model just as much as ours.
-
-Classifiers with confidence
-
-Because Dr. Zhang reports a classifier rather than a regressor, a native classifier
-was also built for the screening framing, consisting of a 3-class classifier at
-distribution coefficients of 0.5 and 10 and a binary classifier for whether the extractant
-extracts at all (logD above 0), each of which carries a confidence score equal to
-the predicted probability of the chosen class. On Track A, the new molecules, the
-3-class classifier reaches 0.625 over all rows and rises with confidence to 0.766,
-0.854, and 0.912 over the most confident half, quarter, and tenth, while the binary
-classifier reaches 0.742 accuracy with a ROC AUC of 0.817 and rises to 0.962 on the
-most confident tenth. On Track B, the known molecules, the 3-class classifier reaches
-0.753 over all rows, which is above the 0.72 reference, and rises to 0.906, 0.956,
-and 0.983 over the most confident half, quarter, and tenth, while the binary
-classifier reaches 0.832 accuracy with a ROC AUC of 0.910, so that the native
-classifier ranks confidence more sharply than binning the regression did and, on the
-known-molecule task, beats the reference outright.
-
-Limitations
-
-The accuracy on new molecules is capped by the fact that there are only 295 distinct
-extractants, so Track A is already near its achievable ceiling and would be moved by
-
+## How to run
+Place `Training_Data_V27.csv` and `Testing_Data_V39.csv` in the working directory, then:
+```bash
+python3 scripts/confidence_tune.py
+python3 scripts/deploy_final.py
+python3 scripts/metal_confidence.py
+python3 scripts/classifier_confidence.py
+python3 scripts/xgb_confidence.py
+python3 scripts/tabpfn_in_stack.py
+python3 scripts/build_workbook2.py
+```

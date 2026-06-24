@@ -24,3 +24,7 @@ venv/
 
 # OS
 .DS_Store
+
+# Office temporary/lock files
+~$*
+*.tmp
