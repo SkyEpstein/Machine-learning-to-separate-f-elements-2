@@ -1,0 +1,13 @@
+track,select_top_pct,method,mean_actual_logD,recall_true_best
+Track A (new molecule),5,UCB (hi90),0.84,0.18
+Track A (new molecule),5,greedy (prediction),2.23,0.45
+Track A (new molecule),5,random,0.04,0.05
+Track A (new molecule),10,UCB (hi90),0.82,0.26
+Track A (new molecule),10,greedy (prediction),1.86,0.54
+Track A (new molecule),10,random,0.06,0.11
+Track B (known molecule),5,UCB (hi90),1.81,0.38
+Track B (known molecule),5,greedy (prediction),2.59,0.57
+Track B (known molecule),5,random,-0.01,0.06
+Track B (known molecule),10,UCB (hi90),1.7,0.5
+Track B (known molecule),10,greedy (prediction),2.26,0.67
+Track B (known molecule),10,random,-0.03,0.09

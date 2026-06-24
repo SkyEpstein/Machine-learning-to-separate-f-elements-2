@@ -178,5 +178,12 @@ if os.path.exists("classifier_confidence_results.csv"):
         cc.values.tolist(), [30, 16, 10, 16, 20, 20],
         note="Native classifiers at the Zhang-style cut points (distribution coefficient 0.5 and 10) and a binary logD greater than 0 screen, each with a confidence score (the max class probability). Selective accuracy rises with confidence, which a single flat accuracy does not show. Zhang reference: 3-class accuracy 0.72, macro-F1 0.67.")
 
+if os.path.exists("ucb_analysis_results.csv"):
+    uc = pd.read_csv("ucb_analysis_results.csv")
+    sheet("Active analysis (UCB)",
+        ["Track", "Select top %", "Method", "Mean actual logD", "Recall of true-best"],
+        uc.values.tolist(), [22, 12, 22, 16, 18],
+        note="Ranking candidate combinations to test. UCB is the upper end of the 90 percent conformal interval (prediction plus uncertainty). For one-shot screening, ranking by the plain prediction (greedy) finds the strongest extractants and beats UCB, because the uncertainty bonus pulls in uncertain but mediocre candidates. UCB's role is sequential active learning, where exploring uncertain candidates improves the model over rounds. The top 5 percent by prediction reach mean actual logD near 2.2 (new) to 2.6 (known) against 0.02 over all rows.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)
