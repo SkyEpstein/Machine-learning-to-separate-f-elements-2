@@ -253,5 +253,13 @@ if os.path.exists("dg_pseudo_results.csv"):
         [30, 18, 12, 18],
         note="Testing the idea of adding confident predictions (the narrow 90 percent interval ones) as training rows without experiments. Adding the model's own confident predictions barely helps (test R2 +0.00 to +0.01), because a confident prediction carries no new information. Adding the same systems with their true labels, which is what running the experiments would give, helps materially (+0.06 to +0.10). So confidence is for deciding which predictions to trust and skip, not for manufacturing training data; the real gains come from experiments on the uncertain points.")
 
+if os.path.exists("dg_confidence_sweep_results.csv"):
+    cs = pd.read_csv("dg_confidence_sweep_results.csv")
+    sheet("Confidence sweep",
+        ["Part", "Model or ranker", "All R2", "Top 25% R2", "Top 10% R2", "Top 10% RMSE"],
+        cs[['part', 'name', 'all_R2', 'top25_R2', 'top10_R2', 'top10_RMSE']].values.tolist(),
+        [18, 24, 9, 12, 12, 14],
+        note="Two sweeps on the per-pair delta G model. Part A applies the same LightGBM confidence ranker to each prediction model: all tree models benefit, climbing from about 0.42-0.47 overall to roughly 0.75-0.79 at the most confident tenth, with XGBoost and HistGB edging RandomForest on that small sliver while RandomForest stays best overall, and CatBoost the outlier whose errors are least predictable. Part B fixes the predictor at RandomForest and sweeps the confidence estimator: the learned err models (LightGBM, RandomForest) rank best and are about tied, while RandomForest's own tree-spread is the weakest ranker, which is why a learned err model is used rather than the native uncertainty. The current setup (RandomForest predictor, LightGBM err ranker) is validated.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)

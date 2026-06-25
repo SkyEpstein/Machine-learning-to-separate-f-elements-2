@@ -1,0 +1,11 @@
+part,name,all_R2,top25_R2,top10_R2,top10_RMSE
+A pred-model,RandomForest,0.473,0.689,0.759,3.71
+A pred-model,ExtraTrees,0.419,0.667,0.754,4.04
+A pred-model,HistGB,0.426,0.671,0.785,3.49
+A pred-model,LightGBM,0.428,0.689,0.753,3.84
+A pred-model,XGBoost,0.45,0.663,0.789,3.1
+A pred-model,CatBoost,0.434,0.531,0.602,4.02
+B conf-ranker (RF),err-LightGBM,0.473,0.689,0.759,3.71
+B conf-ranker (RF),err-RandomForest,0.473,0.696,0.748,3.32
+B conf-ranker (RF),err-ExtraTrees,0.473,0.663,0.7,3.73
+B conf-ranker (RF),RF tree-spread (native),0.473,0.613,0.659,4.49

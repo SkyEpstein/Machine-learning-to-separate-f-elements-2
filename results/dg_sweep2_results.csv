@@ -1,0 +1,8 @@
+model,R2,RMSE_kJmol
+RF (full 995),0.473,6.31
+ExtraTrees (full),0.419,6.62
+"RF tuned (full, sqrt)",0.348,7.02
+RF (desc only),0.472,6.32
+"kNN (desc, scaled)",0.105,8.22
+"SVR rbf (desc, scaled)",0.17,7.92
+NNLS stack (RF+ET+SVR+TabPFN),0.471,6.32
