@@ -1,0 +1,6 @@
+setting,add_confident_pct,test_R2,test_RMSE_kJmol
+baseline (seed only),0,0.296,7.07
+pseudo (predicted labels),50,0.296,7.06
+oracle (true labels),50,0.355,6.76
+pseudo (predicted labels),100,0.31,6.99
+oracle (true labels),100,0.392,6.56

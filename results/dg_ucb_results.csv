@@ -1,0 +1,9 @@
+analysis,select_top_pct,method,mean_actual_dG,recall_true_best
+UCB selection,5,UCB (pred - unc),-4.13,0.18
+UCB selection,5,greedy (pred),-10.47,0.34
+UCB selection,5,random,-0.3,0.04
+UCB selection,10,UCB (pred - unc),-4.06,0.31
+UCB selection,10,greedy (pred),-8.54,0.43
+UCB selection,10,random,0.44,0.1
+triage,25,accept confident,4.13,0.62
+triage,50,accept confident,4.64,0.54

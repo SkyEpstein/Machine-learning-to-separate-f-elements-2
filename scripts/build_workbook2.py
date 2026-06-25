@@ -237,5 +237,21 @@ if os.path.exists("ecm_ensemble_results.csv"):
         [26, 16, 16],
         note="Ensemble sweep for the per-pair delta G target: each base model under molecule-grouped cross-validation, then equal-weight and NNLS stacks. RandomForest is the best single model (R2 0.473), with the bagged-tree models ahead of the boosters on this small wide table and Ridge near zero (the signal is nonlinear). The NNLS stack, scored with a second cross-validation (0.474), only ties RandomForest, so stacking adds nothing here and the ECM uses plain RandomForest. NNLS weights: RandomForest 0.56, CatBoost 0.28, ExtraTrees 0.19.")
 
+if os.path.exists("dg_ucb_results.csv"):
+    du = pd.read_csv("dg_ucb_results.csv")
+    sheet("Delta G UCB",
+        ["Analysis", "Top %", "Method", "Mean actual dG / RMSE (kJ/mol)", "Recall / within 3 kJ/mol"],
+        du[['analysis', 'select_top_pct', 'method', 'mean_actual_dG', 'recall_true_best']].values.tolist(),
+        [16, 8, 18, 28, 22],
+        note="UCB active analysis run on the delta G model, since delta G is the predictor that drives the screening. To find the strongest extractants (most negative delta G), ranking by the plain prediction (greedy) is best for a one-shot pick: the top 5 percent average delta G -10.5 kJ/mol versus -0.3 at random, while UCB's uncertainty term dilutes that and is for sequential rounds. Triage: the most confident quarter of predictions can be accepted without experiments at RMSE about 4 kJ/mol, so the experiment budget goes to the uncertain rest.")
+
+if os.path.exists("dg_pseudo_results.csv"):
+    dp = pd.read_csv("dg_pseudo_results.csv")
+    sheet("Delta G pseudo-labeling",
+        ["Setting", "Confident added %", "Test R2", "Test RMSE (kJ/mol)"],
+        dp[['setting', 'add_confident_pct', 'test_R2', 'test_RMSE_kJmol']].values.tolist(),
+        [30, 18, 12, 18],
+        note="Testing the idea of adding confident predictions (the narrow 90 percent interval ones) as training rows without experiments. Adding the model's own confident predictions barely helps (test R2 +0.00 to +0.01), because a confident prediction carries no new information. Adding the same systems with their true labels, which is what running the experiments would give, helps materially (+0.06 to +0.10). So confidence is for deciding which predictions to trust and skip, not for manufacturing training data; the real gains come from experiments on the uncertain points.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)
