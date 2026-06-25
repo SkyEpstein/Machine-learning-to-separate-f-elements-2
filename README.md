@@ -31,6 +31,14 @@ For new molecules (Track A) the structure does not generalize from only about 30
 
 > Note: The two tracks are kept separate because allowing the same molecule in both training and testing inflates performance estimates.
 
+## ECM: predicting the free energy of extraction
+
+A second framing predicts the Gibbs free energy of extraction (delta G) instead of logD, using only the extractant structure and the metal, with the reaction conditions dropped. The free energy is computed from logD by the standard relation delta G = -2.303 R T logD (in kJ per mole, with R the gas constant and T the temperature), so a favorable extraction gives a negative, spontaneous delta G. The point of this version is that the free energy is meant to be a property of the extractant and the metal rather than of the particular acid concentration or temperature, so the conditions are left out and the model predicts the thermodynamics from structure alone.
+
+This was built two ways. The per-row version keeps every measurement as its own delta G; because identical structures then repeat with different free energies that come from the dropped conditions, the structure cannot explain that spread and the accuracy is limited (R2 = 0.270, RMSE = 7.62 kJ/mol). The per-pair version averages delta G to a single value for each extractant, metal, acid, and diluent system, which is condition-independent by construction, and it is the better target (R2 = 0.424, RMSE = 6.60 kJ/mol over 2,273 systems). Both are scored with molecule-grouped cross-validation, so a new extractant never appears in both training and testing.
+
+The confidence layer carries over and is strong here: for the per-pair model the most confident quarter of predictions reach R2 = 0.678 and the most confident tenth reach R2 = 0.814 (RMSE = 3.24 kJ/mol). So the free-energy model is moderate on its own for a brand-new extractant but becomes reliable on the fraction it is confident about, which is the part that matters for screening.
+
 ## Project Structure
 
 ```
