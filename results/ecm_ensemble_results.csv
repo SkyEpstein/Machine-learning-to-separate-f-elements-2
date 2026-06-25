@@ -1,0 +1,11 @@
+model,R2,RMSE_kJmol
+LightGBM,0.424,6.6
+ExtraTrees,0.419,6.62
+RandomForest,0.473,6.31
+HistGB,0.426,6.58
+Ridge,0.026,8.58
+XGBoost,0.444,6.48
+CatBoost,0.441,6.5
+equal-weight,0.459,6.4
+NNLS stack (in-sample),0.479,6.28
+NNLS stack (CV),0.474,6.31

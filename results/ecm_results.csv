@@ -1,3 +1,3 @@
 framing,n,R2_all,RMSE_all_kJmol,R2_top25,R2_top10,RMSE_top10_kJmol
-per-row (framing 1),7066,0.27,7.62,0.48,0.515,5.22
-per-pair (framing 3),2273,0.424,6.6,0.678,0.814,3.24
+per-row (framing 1),7066,0.282,7.55,0.404,0.518,4.85
+per-pair (framing 3),2273,0.473,6.31,0.683,0.776,3.62

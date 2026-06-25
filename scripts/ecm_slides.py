@@ -47,6 +47,12 @@ put2(tf, "Two framings:  ", "per-row keeps every measurement; per-pair averages 
 # ECM results figure
 s = slide(); title(s, "ECM results")
 bottom = add_img(s, "figures/ecm.png", 1.7, 11.6, 4.3)
-caption(s, "Per-pair is the better target (R-squared 0.42, RMSE 6.6 kJ/mol) than per-row (0.27), evaluated with molecule-grouped cross-validation so the extractants are new. Confidence is strong: the most confident quarter reach R-squared 0.68 and the top tenth 0.81 (RMSE 3.2 kJ/mol).", bottom + 0.18)
+caption(s, "Per-pair is the better target (R-squared 0.47, RMSE 6.3 kJ/mol) than per-row (0.28), evaluated with molecule-grouped cross-validation so the extractants are new. Confidence is strong: the most confident quarter reach R-squared 0.68 and the top tenth 0.78 (RMSE 3.6 kJ/mol).", bottom + 0.18)
+# ECM ensemble sweep
+s = slide(); title(s, "ECM ensemble sweep")
+tf = box(s, 0.7, 1.6, 12.0, 5.4)
+put2(tf, "Best model:  ", "RandomForest, R-squared 0.473 (RMSE 6.31 kJ/mol) for the per-pair free energy. The bagged-tree models beat the gradient boosters on this small, wide table of 2,273 systems.", size=15, first=True, space_after=16)
+put2(tf, "The field:  ", "XGBoost 0.444, CatBoost 0.441, HistGB 0.426, LightGBM 0.424, ExtraTrees 0.419, and a linear Ridge near zero, so the signal is nonlinear.", size=15, first=False, space_after=16)
+put2(tf, "Stacking:  ", "an NNLS stack, scored with its own cross-validation, reaches 0.474, a tie with RandomForest alone, so stacking is not used and the ECM is a plain RandomForest.", size=15, first=False, space_after=16)
 prs.save(DECK)
 print(f"appended {len(prs.slides._sldIdLst) - n0} slides; deck now {len(prs.slides._sldIdLst)} slides")

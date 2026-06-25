@@ -25,6 +25,7 @@ import os, time, warnings; os.environ.setdefault('KMP_DUPLICATE_LIB_OK', 'TRUE')
 import numpy as np, pandas as pd
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
 import lightgbm as lgb
 from PIL import Image
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
@@ -56,7 +57,7 @@ def san(M):
 def cv_eval(X, y, grp, label):
     gkf = GroupKFold(5); oof = np.zeros(len(y))
     for ti, vi in gkf.split(X, y, grp):
-        m = lgb.LGBMRegressor(n_estimators=800, learning_rate=0.03, num_leaves=63, subsample=0.8, colsample_bytree=0.7, subsample_freq=1, random_state=0, n_jobs=-1, verbosity=-1).fit(X[ti], y[ti]); oof[vi] = m.predict(X[vi])
+        m = RandomForestRegressor(n_estimators=500, n_jobs=-1, random_state=0).fit(X[ti], y[ti]); oof[vi] = m.predict(X[vi])  # RandomForest: best model from the ensemble sweep (ecm_ensemble.py)
     err = np.zeros(len(y)); resid = np.abs(y - oof)
     for ti, vi in gkf.split(X, y, grp):
         em = lgb.LGBMRegressor(n_estimators=400, learning_rate=0.03, num_leaves=31, random_state=0, n_jobs=-1, verbosity=-1).fit(X[ti], resid[ti]); err[vi] = em.predict(X[vi])

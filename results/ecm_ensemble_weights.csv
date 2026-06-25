@@ -1,0 +1,8 @@
+model,nnls_weight
+LightGBM,0.0
+ExtraTrees,0.1867
+RandomForest,0.5562
+HistGB,0.0
+Ridge,0.0
+XGBoost,0.0
+CatBoost,0.278
