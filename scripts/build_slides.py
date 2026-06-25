@@ -61,14 +61,6 @@ x = 0.7
 for num, lab in [("8,075", "measurements"), ("295", "distinct extractants"), ("28", "f-element metals"), ("~17.5", "log-unit range of logD")]:
     tf = box(s, x, 3.4, 3.0, 1.6); put(tf, num, 44, BLACK, bold=True); put(tf, lab, 14, GRAY, first=False); x += 3.05
 
-# dataset features and why
-s = slide(); title(s, "Dataset features and why")
-tf = box(s, 0.7, 1.5, 12.0, 5.6)
-put2(tf, "Extractant structure:  ", "SMILES, a Morgan fingerprint, RDKit descriptors, and donor-atom counts (O, N, S, P) with logP. These set how, and how strongly, the extractant binds a metal.", size=15, first=True, space_after=14)
-put2(tf, "Metal descriptors:  ", "ionic radius, charge and oxidation state, ionization energies, electronegativity, and atomic number. These carry the lanthanide-contraction trend that makes neighboring rare earths hard to separate, and let the model relate one metal to another.", size=15, first=False, space_after=14)
-put2(tf, "Acid and conditions:  ", "acid type and concentration, temperature, and extractant concentration. logD is an equilibrium, so it shifts with these as much as with the molecule.", size=15, first=False, space_after=14)
-put2(tf, "Diluent (solvent):  ", "molar mass, logP, boiling and melting points, density, solubility, and dipole moment. The diluent sets the organic-phase environment around the extractant.", size=15, first=False, space_after=14)
-
 # 3 two tasks
 s = slide(); title(s, "Two prediction tasks")
 put(box(s, 0.7, 1.5, 12.0, 0.8), "The tasks are kept apart so a molecule cannot leak across training and testing, which would inflate the score.", 16, BLACK)
