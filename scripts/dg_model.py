@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ecm.py — ECM model. Predict the Gibbs free energy of extraction (delta G) instead
+dg_model.py — free-energy (delta G) model. Predict the Gibbs free energy of extraction (delta G) instead
 of logD, from the extractant structure and the metal alone, with the reaction
 conditions dropped. Per the mentor's framing, delta G is the thermodynamic target
 and does not need the reaction conditions.
@@ -57,7 +57,7 @@ def san(M):
 def cv_eval(X, y, grp, label):
     gkf = GroupKFold(5); oof = np.zeros(len(y))
     for ti, vi in gkf.split(X, y, grp):
-        m = RandomForestRegressor(n_estimators=500, n_jobs=-1, random_state=0).fit(X[ti], y[ti]); oof[vi] = m.predict(X[vi])  # RandomForest: best model from the ensemble sweep (ecm_ensemble.py)
+        m = RandomForestRegressor(n_estimators=500, n_jobs=-1, random_state=0).fit(X[ti], y[ti]); oof[vi] = m.predict(X[vi])  # RandomForest: best model from the ensemble sweep (dg_ensemble.py)
     err = np.zeros(len(y)); resid = np.abs(y - oof)
     for ti, vi in gkf.split(X, y, grp):
         em = lgb.LGBMRegressor(n_estimators=400, learning_rate=0.03, num_leaves=31, random_state=0, n_jobs=-1, verbosity=-1).fit(X[ti], resid[ti]); err[vi] = em.predict(X[vi])
@@ -85,16 +85,16 @@ rows = []
 for lab, conf in [("per-row (framing 1)", confr), ("per-pair (framing 3)", confp)]:
     rows.append({'framing': lab, 'n': conf[0][3], 'R2_all': round(conf[0][1], 3), 'RMSE_all_kJmol': round(conf[0][2], 2),
                  'R2_top25': round(conf[2][1], 3), 'R2_top10': round(conf[3][1], 3), 'RMSE_top10_kJmol': round(conf[3][2], 2)})
-pd.DataFrame(rows).to_csv("ecm_results.csv", index=False)
+pd.DataFrame(rows).to_csv("dg_results.csv", index=False)
 out = df.loc[first_idx, [SMI, 'Metal', 'Acid_type']].copy(); out['dG_actual_kJmol'] = np.round(yp, 2); out['dG_pred_kJmol'] = np.round(oofp, 2)
-out.to_csv("ecm_perpair_predictions.csv", index=False)
+out.to_csv("dg_perpair_predictions.csv", index=False)
 # figure
 fig, ax = plt.subplots(1, 2, figsize=(12, 4.6))
 ax[0].scatter(yp, oofp, s=6, alpha=0.3, color='#1F4E79', edgecolors='none')
 lim = [min(yp.min(), oofp.min()), max(yp.max(), oofp.max())]; ax[0].plot(lim, lim, color='#B5402E', lw=1)
 ax[0].set_xlabel('actual dG (kJ/mol)'); ax[0].set_ylabel('predicted dG (kJ/mol)'); ax[0].set_title(f'Per-pair dG, new extractants (R2={confp[0][1]:.2f})')
 labels = ['per-row\nall', 'per-row\ntop10%', 'per-pair\nall', 'per-pair\ntop10%']; vals = [confr[0][1], confr[3][1], confp[0][1], confp[3][1]]
-ax[1].bar(labels, vals, color=['#999999', '#999999', '#2E8B57', '#2E8B57']); ax[1].set_ylabel('R-squared'); ax[1].set_title('ECM accuracy by framing and confidence'); ax[1].axhline(0, color='k', lw=0.6)
-fig.tight_layout(); fig.savefig('figures/ecm.png', bbox_inches='tight', facecolor='white'); plt.close(fig)
-_im = Image.open('figures/ecm.png').convert('RGBA'); _bg = Image.new('RGB', _im.size, (255, 255, 255)); _bg.paste(_im, mask=_im.split()[3]); _bg.save('figures/ecm.png')
-print(f"\nsaved ecm_results.csv, ecm_perpair_predictions.csv, figures/ecm.png | {(time.time()-START)/60:.1f} min")
+ax[1].bar(labels, vals, color=['#999999', '#999999', '#2E8B57', '#2E8B57']); ax[1].set_ylabel('R-squared'); ax[1].set_title('Free energy accuracy by framing and confidence'); ax[1].axhline(0, color='k', lw=0.6)
+fig.tight_layout(); fig.savefig('figures/dg.png', bbox_inches='tight', facecolor='white'); plt.close(fig)
+_im = Image.open('figures/dg.png').convert('RGBA'); _bg = Image.new('RGB', _im.size, (255, 255, 255)); _bg.paste(_im, mask=_im.split()[3]); _bg.save('figures/dg.png')
+print(f"\nsaved dg_results.csv, dg_perpair_predictions.csv, figures/dg.png | {(time.time()-START)/60:.1f} min")

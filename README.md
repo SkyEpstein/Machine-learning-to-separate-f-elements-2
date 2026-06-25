@@ -31,7 +31,7 @@ For new molecules (Track A) the structure does not generalize from only about 30
 
 > Note: The two tracks are kept separate because allowing the same molecule in both training and testing inflates performance estimates.
 
-## ECM: predicting the free energy of extraction
+## Predicting the free energy of extraction (delta G)
 
 A second framing predicts the Gibbs free energy of extraction (delta G) instead of logD, using only the extractant structure and the metal, with the reaction conditions dropped. The free energy is computed from logD by the standard relation delta G = -2.303 R T logD (in kJ per mole, with R the gas constant and T the temperature), so a favorable extraction gives a negative, spontaneous delta G. The point of this version is that the free energy is meant to be a property of the extractant and the metal rather than of the particular acid concentration or temperature, so the conditions are left out and the model predicts the thermodynamics from structure alone.
 

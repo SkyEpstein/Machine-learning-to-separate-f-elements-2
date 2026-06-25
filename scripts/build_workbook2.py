@@ -221,21 +221,21 @@ if os.path.exists("experiment_triage_results.csv"):
         [22, 26, 16, 20, 12, 22],
         note="The high-confidence predictions do not need experiments; they are trusted as-is, so the experiment budget goes to the uncertain remainder. For known molecules the most confident half can be accepted at RMSE 0.535 with 75 percent within half a log unit, which halves the experiments needed. New molecules degrade faster, so a smaller, more confident slice is accepted. For the experiments that are run, sampling by uncertainty improves the model fastest.")
 
-if os.path.exists("ecm_results.csv"):
-    ec = pd.read_csv("ecm_results.csv")
-    sheet("ECM (free energy target)",
+if os.path.exists("dg_results.csv"):
+    ec = pd.read_csv("dg_results.csv")
+    sheet("Free energy (delta G)",
         ["Framing", "Systems", "R2 all", "RMSE all (kJ/mol)", "R2 top 25% conf", "R2 top 10% conf", "RMSE top 10% (kJ/mol)"],
         ec[['framing', 'n', 'R2_all', 'RMSE_all_kJmol', 'R2_top25', 'R2_top10', 'RMSE_top10_kJmol']].values.tolist(),
         [20, 10, 9, 18, 16, 16, 20],
-        note="ECM predicts the Gibbs free energy of extraction (delta G = -2.303 R T logD, in kJ/mol, so favorable extraction is negative) from the extractant structure and the metal, with all reaction conditions dropped. The model is a RandomForest, the best of an ensemble sweep (see the ECM ensemble sweep sheet). Per-row keeps every measurement; per-pair averages delta G to one value per extractant-metal-acid-diluent system and is condition-independent. Per-pair is the better target (R2 0.47 versus 0.28) because identical structures otherwise repeat with condition-driven delta G the structure cannot explain. Confidence ranking is strong for per-pair: the most confident quarter reach R2 0.68 and the top tenth R2 0.78 (RMSE 3.6 kJ/mol). Molecule-grouped cross-validation, so a new extractant never appears in both train and test.")
+        note="The free-energy model predicts the Gibbs free energy of extraction (delta G = -2.303 R T logD, in kJ/mol, so favorable extraction is negative) from the extractant structure and the metal, with all reaction conditions dropped. The model is a RandomForest, the best of an ensemble sweep (see the Delta G ensemble sweep sheet). Per-row keeps every measurement; per-pair averages delta G to one value per extractant-metal-acid-diluent system and is condition-independent. Per-pair is the better target (R2 0.47 versus 0.28) because identical structures otherwise repeat with condition-driven delta G the structure cannot explain. Confidence ranking is strong for per-pair: the most confident quarter reach R2 0.68 and the top tenth R2 0.78 (RMSE 3.6 kJ/mol). Molecule-grouped cross-validation, so a new extractant never appears in both train and test.")
 
-if os.path.exists("ecm_ensemble_results.csv"):
-    es = pd.read_csv("ecm_ensemble_results.csv")
-    sheet("ECM ensemble sweep",
+if os.path.exists("dg_ensemble_results.csv"):
+    es = pd.read_csv("dg_ensemble_results.csv")
+    sheet("Delta G ensemble sweep",
         ["Model", "R2 (per-pair dG)", "RMSE (kJ/mol)"],
         es[['model', 'R2', 'RMSE_kJmol']].values.tolist(),
         [26, 16, 16],
-        note="Ensemble sweep for the per-pair delta G target: each base model under molecule-grouped cross-validation, then equal-weight and NNLS stacks. RandomForest is the best single model (R2 0.473), with the bagged-tree models ahead of the boosters on this small wide table and Ridge near zero (the signal is nonlinear). The NNLS stack, scored with a second cross-validation (0.474), only ties RandomForest, so stacking adds nothing here and the ECM uses plain RandomForest. NNLS weights: RandomForest 0.56, CatBoost 0.28, ExtraTrees 0.19.")
+        note="Ensemble sweep for the per-pair delta G target: each base model under molecule-grouped cross-validation, then equal-weight and NNLS stacks. RandomForest is the best single model (R2 0.473), with the bagged-tree models ahead of the boosters on this small wide table and Ridge near zero (the signal is nonlinear). The NNLS stack, scored with a second cross-validation (0.474), only ties RandomForest, so stacking adds nothing here and the free-energy model uses plain RandomForest. NNLS weights: RandomForest 0.56, CatBoost 0.28, ExtraTrees 0.19.")
 
 if os.path.exists("dg_ucb_results.csv"):
     du = pd.read_csv("dg_ucb_results.csv")

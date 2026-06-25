@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ecm_ensemble.py — ensemble sweep for the ECM (delta G, per-pair) target. Each
+dg_ensemble.py — ensemble sweep for the per-pair delta G (free energy) target. Each
 diverse base model is evaluated with molecule-grouped cross-validation, then their
 out-of-fold predictions are combined two ways: equal weight, and non-negative least
 squares (NNLS), which self-prunes weak members. The NNLS stack is also scored with
@@ -83,6 +83,6 @@ print(f"  best single = {best_single} (R2={r2_score(y,oof[best_single]):.3f}); s
 rows += [{'model': 'equal-weight', 'R2': round(r2_score(y, eq), 3), 'RMSE_kJmol': round(rmse(y, eq), 2)},
          {'model': 'NNLS stack (in-sample)', 'R2': round(r2_score(y, pred_in), 3), 'RMSE_kJmol': round(rmse(y, pred_in), 2)},
          {'model': 'NNLS stack (CV)', 'R2': round(r2_score(y, stack_cv), 3), 'RMSE_kJmol': round(rmse(y, stack_cv), 2)}]
-pd.DataFrame(rows).to_csv("ecm_ensemble_results.csv", index=False)
-pd.DataFrame([{'model': n, 'nnls_weight': round(float(wi), 4)} for n, wi in zip(names, w)]).to_csv("ecm_ensemble_weights.csv", index=False)
-print(f"\nsaved ecm_ensemble_results.csv, ecm_ensemble_weights.csv | {(time.time()-START)/60:.1f} min")
+pd.DataFrame(rows).to_csv("dg_ensemble_results.csv", index=False)
+pd.DataFrame([{'model': n, 'nnls_weight': round(float(wi), 4)} for n, wi in zip(names, w)]).to_csv("dg_ensemble_weights.csv", index=False)
+print(f"\nsaved dg_ensemble_results.csv, dg_ensemble_weights.csv | {(time.time()-START)/60:.1f} min")
