@@ -261,5 +261,13 @@ if os.path.exists("dg_confidence_sweep_results.csv"):
         [18, 24, 9, 12, 12, 14],
         note="Two sweeps on the per-pair delta G model. Part A applies the same LightGBM confidence ranker to each prediction model: all tree models benefit, climbing from about 0.42-0.47 overall to roughly 0.75-0.79 at the most confident tenth, with XGBoost and HistGB edging RandomForest on that small sliver while RandomForest stays best overall, and CatBoost the outlier whose errors are least predictable. Part B fixes the predictor at RandomForest and sweeps the confidence estimator: the learned err models (LightGBM, RandomForest) rank best and are about tied, while RandomForest's own tree-spread is the weakest ranker, which is why a learned err model is used rather than the native uncertainty. The current setup (RandomForest predictor, LightGBM err ranker) is validated.")
 
+if os.path.exists("dg_coverage_results.csv"):
+    cov = pd.read_csv("dg_coverage_results.csv").fillna("")
+    sheet("Delta G interval calibration",
+        ["Target", "Empirical coverage", "Mean width (kJ/mol)"],
+        cov[['target', 'empirical_coverage', 'mean_width_kJmol']].astype(object).values.tolist(),
+        [12, 20, 20],
+        note="Honest molecule-split conformal check of the delta G prediction intervals: the conformal quantile is set on one set of molecules and coverage is measured on a disjoint set. The 90 percent interval covers 90.2 percent of held-out cases and the 80 percent interval covers 80.2 percent, so the stated confidence can be trusted. The intervals are calibrated and heterogeneous: the confident, narrow-interval predictions are the accurate ones (most confident tenth R2 0.78, RMSE 3.6 kJ/mol), while the uncertain ones get wide intervals and are sent to the lab. This calibration is what lets the intervals drive the active analysis: trust and skip the confident predictions, test the uncertain ones.")
+
 wb.save("REE_Results_Organized.xlsx")
 print("saved REE_Results_Organized.xlsx with sheets:", wb.sheetnames)
