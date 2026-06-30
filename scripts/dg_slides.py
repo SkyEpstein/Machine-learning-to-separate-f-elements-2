@@ -47,11 +47,11 @@ put2(tf, "Two framings:  ", "per-row keeps every measurement; per-pair averages 
 # free energy results figure
 s = slide(); title(s, "Free energy (delta G) results")
 bottom = add_img(s, "figures/dg.png", 1.7, 11.6, 4.3)
-caption(s, "Per-pair is the better target (R-squared 0.47, RMSE 6.3 kJ/mol) than per-row (0.28), evaluated with molecule-grouped cross-validation so the extractants are new. Confidence is strong: the most confident quarter reach R-squared 0.68 and the top tenth 0.78 (RMSE 3.6 kJ/mol).", bottom + 0.18)
+caption(s, "Per-pair is the better target (R-squared about 0.46, RMSE 6.3 kJ/mol) than per-row (0.28), molecule-grouped so the extractants are new. The 0.473 shown elsewhere was a selected maximum; the mean over shuffled splits is 0.461 plus or minus 0.009. Confidence is strong: the most confident tenth drop RMSE to 3.6 kJ/mol.", bottom + 0.18)
 # delta G ensemble sweep
 s = slide(); title(s, "Delta G ensemble sweep")
 tf = box(s, 0.7, 1.6, 12.0, 5.4)
-put2(tf, "Best model:  ", "RandomForest, R-squared 0.473 (RMSE 6.31 kJ/mol) for the per-pair free energy. The bagged-tree models beat the gradient boosters on this small, wide table of 2,273 systems.", size=15, first=True, space_after=16)
+put2(tf, "Best model:  ", "RandomForest, R-squared about 0.46 plus or minus 0.01 (RMSE 6.3 kJ/mol) for the per-pair free energy; 0.473 was the maximum of the search, the mean over splits is 0.461. The bagged-tree models beat the gradient boosters on this small, wide table of 2,273 systems.", size=15, first=True, space_after=16)
 put2(tf, "The field:  ", "XGBoost 0.444, CatBoost 0.441, HistGB 0.426, LightGBM 0.424, ExtraTrees 0.419, and a linear Ridge near zero, so the signal is nonlinear.", size=15, first=False, space_after=16)
 put2(tf, "Stacking:  ", "an NNLS stack, scored with its own cross-validation, reaches 0.474, a tie with RandomForest alone, so stacking is not used and the free-energy model is a plain RandomForest.", size=15, first=False, space_after=16)
 # UCB and active-learning graphs
@@ -62,5 +62,21 @@ caption(s, "Left: sampling the uncertain points builds the best model. Middle: r
 s = slide(); title(s, "Active analysis: calibrated intervals")
 bottom = add_img(s, "figures/active_analysis.png", 1.75, 12.4, 3.9)
 caption(s, "Left: the delta G intervals are calibrated, target coverage matches empirical coverage at every level. Middle: keeping only the most confident predictions raises R-squared from 0.47 to 0.78 and cuts RMSE from 6.3 to 3.6 kJ/mol. Right: the most confident quarter (blue) hug the diagonal. Calibrated, heterogeneous intervals are what let the model say which predictions to trust and which to test.", bottom + 0.18)
+# honest numbers after the audit
+s = slide(); title(s, "Honest numbers after the audit")
+tf = box(s, 0.7, 1.5, 12.0, 5.6)
+put2(tf, "Track A (new molecule):  ", "logD R-squared 0.466, unchanged and honest.", size=15, first=True, space_after=13)
+put2(tf, "Track B (known molecule):  ", "honest R-squared about 0.61, interpolating conditions for a molecule already seen. The 0.725 figure was a random-row split that memorizes replicates; on genuinely new molecules these features fall to about 0.44.", size=15, first=False, space_after=13)
+put2(tf, "Free energy (delta G):  ", "R-squared about 0.46 plus or minus 0.01; the 0.473 was a selected maximum of a model search.", size=15, first=False, space_after=13)
+put2(tf, "Confidence:  ", "the 90 percent intervals are calibrated (they cover 90 percent); the most-confident-slice figures are operating points, not overall accuracy.", size=15, first=False, space_after=13)
+put2(tf, "Versus Dr. Zhang:  ", "about equal on the same data and split (0.657 vs 0.648); the split, not the model, drives his 0.72 headline.", size=15, first=False, space_after=13)
+# active-analysis trends
+s = slide(); title(s, "Active analysis: good picks or mid?")
+bottom = add_img(s, "figures/active_analysis_trends.png", 1.55, 11.8, 4.6)
+caption(s, "Greedy selection puts 81 percent of its top picks in the strongest tertile (vs 37 percent random) and beats each metal's average, but it captures only about 62 percent of the achievable strength and about 57 percent of its top-decile picks miss the true elite. Its confident picks are the trustworthy ones.", bottom + 0.16)
+# chosen-extractant trends
+s = slide(); title(s, "What the chosen extractants share")
+bottom = add_img(s, "figures/picks_trends.png", 1.9, 12.2, 4.0)
+caption(s, "The picks concentrate on americium and the trivalent lanthanides and actinides (americium 2.85x over-represented, 30 percent of picks), and lean toward less-aromatic, more aliphatic extractants, consistent with classic organophosphorus f-element extractants. Effect sizes are modest.", bottom + 0.18)
 prs.save(DECK)
 print(f"appended {len(prs.slides._sldIdLst) - n0} slides; deck now {len(prs.slides._sldIdLst)} slides")

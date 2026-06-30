@@ -1,0 +1,6 @@
+track,regime,features,R2,R2_std,RMSE,note
+Track A,new molecule (molecule-grouped),conditions+metal,0.481,0.008,1.131,honest new-extractant screening (single-LightGBM reproduction)
+Track B,"known molecule, random-row (UPPER BOUND)",conditions+ECFP+ligand,0.68,0.001,0.888,"includes replicate memorization, not generalization"
+Track B,"condition interpolation (condition-key grouped, HONEST)",conditions+ECFP+ligand,0.607,0.002,0.984,interpolate new conditions for an already-seen molecule
+Track B,new molecule (molecule-grouped),conditions+ECFP+ligand,0.443,0.001,1.172,rich features collapse to about Track A on new molecules
+noise floor,within condition-key Log_D std,,,,0.445,irreducible label noise

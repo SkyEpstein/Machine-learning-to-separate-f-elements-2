@@ -45,6 +45,21 @@ sheet("Summary",
     note="Both metrics shown throughout: R2 (higher is better) and RMSE in log units (lower is better). Data cleaned to 7065 rows (dropped exact duplicates and replicate groups disagreeing by more than 2 log units).")
 
 # 2. Experiment log (mentor template style, our modeling work)
+sheet("Audit corrections",
+    ["Quantity", "Honest value", "Previously reported", "Why / caveat"],
+    [
+    ["Track A new-molecule logD R2", "0.466 (RMSE 1.148)", "0.466", "Honest, molecule-grouped CV. Unchanged."],
+    ["Track B logD R2 (honest)", "about 0.61 (RMSE about 0.98)", "0.725", "0.725 used a random-row split that memorizes replicate siblings (the fingerprint is constant within a molecule); about 0.07 R2 is leakage. The honest 0.61 is condition-key grouped: interpolate new conditions for an already-seen molecule."],
+    ["Track B on NEW molecules", "about 0.44", "read as 0.725", "The rich features collapse to about Track A on unseen molecules."],
+    ["delta G per-pair R2", "0.46 plus or minus 0.01 (RMSE 6.3)", "0.473", "0.473 was the maximum of a roughly 55-way model and hyperparameter search on one fixed split; the mean over shuffled molecule-grouped splits is 0.461 plus or minus 0.009."],
+    ["Top-10 percent confidence R2", "selective-prediction operating point", "0.912 / 0.940 / 0.776", "Report the RMSE drop; the R2 rise is partly the shrinking variance of the retained subset. The Track B 0.940 is on a leaky split and is being recomputed on the condition-key split."],
+    ["Zhang comparison", "ours 0.657 CV / 0.692 holdout vs his 0.648 / 0.680", "his 0.605; we match 0.72", "0.605 was his model run on our data on a different split, which widened the gap. The same-data comparison shows the models about equal, so the split, not the model, drives his 0.72 headline. His 0.72 reproduces at 0.68; ours is 0.692 on his holdout (within 0.03)."],
+    ["Per-metal and classifier R2", "known-molecule (random CV) values", "0.80+ per metal; 0.753 classifier", "These are known-molecule optimistic. The grouped classifier is 0.625 (3-class) vs a 0.385 majority baseline; the per-metal new-molecule numbers are lower."],
+    ["Data basis", "label-QC-cleaned (8075 to 7066 rows); noise floor about 0.45 log units", "across all rows", "Cleaning (replicate logD range at most 2) also removes the hardest measurements from evaluation, so all absolute numbers are an upper bound."],
+    ],
+    [30, 34, 22, 64],
+    note="Corrections from a full adversarial audit. The modeling is fundamentally honest: genuine molecule-grouped cross-validation with zero train/test molecule overlap, no feature encodes the target, and the confidence intervals are calibrated (90 percent covers 90 percent). These entries correct optimistic framing and the Track B replicate-memorization leakage so the reported numbers match what the evaluation supports. Where other sheets still show the earlier values, this sheet supersedes them.")
+
 sheet("Experiment Log",
     ["Version", "Extractant representation", "Metals", "Solvents", "Acid", "Model", "Settings", "CV R2", "CV RMSE", "Notes"],
     [
@@ -130,11 +145,11 @@ sheet("Zhang Comparison",
     ["Binary extract screen (logD > 0)", "Not reported", "Track A accuracy 0.742, ROC AUC 0.817; Track B accuracy 0.832, ROC AUC 0.910"],
     ["Continuous logD, R2 and RMSE", "Not provided (classifier only)", "Track A 0.466 and 1.148; Track B 0.725 and 0.823"],
     ["Per-prediction uncertainty", "None", "Confidence score plus conformal interval at 90 percent coverage"],
-    ["His XGBoost under our cross-validation", "0.72 reported (one 494-row holdout)", "0.605 over all new molecules; same model on honest CV, so 0.72 reflects the favorable holdout and the imbalanced classes, not a stronger model"],
+    ["His XGBoost, same-data comparison", "0.72 reported (one 494-row holdout)", "On the same data his model scores 0.648 (our CV) and 0.680 (his holdout); his 0.72 reproduces at 0.68. The split, not a stronger model, drives the headline. An earlier 0.605 figure was his model on a different split and overstated the gap."],
     ["His XGBoost plus our confidence", "0.72 flat, no ranking", "0.734 at top 50 percent; 0.847 at top 25 percent; 0.914 at top 10 percent; binary screen ROC AUC 0.798"],
-    ["Our model on his exact 494-row test", "his 0.72 (tuned XGBoost on this test)", "0.692 raw, which matches him; with our confidence 0.863 at top 25 percent and 1.000 at top 10 percent; also returns continuous logD (R2 0.360) and an interval"],
+    ["Our model on his exact 494-row test", "his 0.72 (tuned XGBoost on this test)", "0.692, within about 0.03 of his 0.72; with our confidence 0.863 at top 25 percent and 1.000 at top 10 percent; also returns continuous logD (R2 0.360) and an interval"],
     ["Common-split test (same data and features)", "his XGBoost: 0.648 our CV, 0.680 his holdout (0.72 tuned)", "our LightGBM: 0.657 our CV, 0.692 his holdout; the two models are about equal on a common split, so the split not the model drives his headline"],
-    ["Verdict", "Higher raw 3-class accuracy on its single holdout, but flat, with no way to rank predictions", "Matches on new molecules once confidence is used (0.912 at top 10 percent), beats 0.72 outright on known molecules (0.753), and also returns the value, the uncertainty, and the separations"],
+    ["Verdict", "Higher raw 3-class accuracy on its single holdout, but flat, with no way to rank predictions", "About equal on the same-data common split (0.657 vs 0.648 our CV; 0.692 vs 0.680 his holdout), so the split drives his headline. Our added value is calibrated uncertainty, continuous logD, and the separations, not higher accuracy."],
     ],
     [24, 46, 58],
     note="Both datasets have exactly 8075 rows, so they are almost certainly the same integrated f-element dataset. His 3-class cut points are inferred as distribution coefficient D = 0.5 and 10 from the folder name and num_class=3. His accuracy is one 494-row holdout; ours is cross-validated. Therefore this is a close comparison, not an exact one.")
