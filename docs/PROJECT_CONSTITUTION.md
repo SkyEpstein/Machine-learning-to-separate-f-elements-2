@@ -60,7 +60,7 @@ Success is not a high raw R-squared. It is calibrated, honest uncertainty; an ac
 - **Skyler Epstein:** direction, the manuscript, running experiments.
 - **Assistant:** coding, modeling, analysis, documentation.
 - **Repository:** public, github.com/SkyEpstein/Machine-learning-to-separate-f-elements-2, pushed under SkyEpstein; training data intentionally public.
-- **Governance artifacts:** the Decision Log and Audit corrections tab in the workbook, and `docs/METHODS_AND_RESULTS.md`.
+- **Governance artifacts:** `docs/METHODS_AND_RESULTS.md`, `docs/TECH_STACK.md`, `docs/ROADMAP.md`, `CHANGELOG.md`, the `specs/` feature specs, the `spec-feature` skill, and the Decision Log and Audit corrections tab in the workbook.
 
 ## 10. Amendment
 Reviewed and amended by Skyler. Material modeling decisions are recorded in the Decision Log; audit corrections are recorded in the Audit corrections tab.
