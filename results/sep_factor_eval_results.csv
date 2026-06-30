@@ -1,0 +1,3 @@
+regime,signed_R2,signed_RMSE,magnitude_R2,magnitude_RMSE,direction_acc,spearman_signed,useful>=0.5_acc,useful>=0.5_F1,useful>=1.0_acc,useful>=1.0_F1
+known extractant,0.356,1.294,0.166,1.066,0.726,0.601,0.645,0.714,0.727,0.616
+new extractant,0.188,1.453,-0.199,1.278,0.656,0.462,0.577,0.596,0.663,0.439

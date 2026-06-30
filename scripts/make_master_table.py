@@ -22,6 +22,8 @@ R = [
     ["Sign correctness, Track A", "LightGBM", "0.743 (0.903 top 10%)", "", "7066", "molecule-grouped CV", "Predicted logD sign matches actual (extract-or-not)", "sign_separation_results.csv"],
     ["Separation, Track B (differencing)", "logD model differenced", "signed R2 0.582", "", "", "matched conditions", "Direction correct 76.3%; predict-under 63.3%", "sign_separation_results.csv"],
     ["Separation, direct delta-logD model", "LightGBM (pairs)", "signed R2 -1.92", "2.76", "4598", "molecule-grouped CV", "Loses to differencing (0.188); too few extractants with pairs", "sep_factor_results.csv"],
+    ["Separation factor, f-elements (known extractant)", "logD diff, cond-key", "signed R2 0.356", "1.294", "4598", "condition-key CV, matched conditions", "Direction 72.6%, Spearman 0.60, magnitude R2 0.166; deployed stack with fingerprints reaches ~0.58", "sep_factor_eval_results.csv"],
+    ["Separation factor, f-elements (new extractant)", "logD diff, mol-grouped", "signed R2 0.188", "1.453", "4598", "molecule-grouped CV", "Direction 65.6%, Spearman 0.46, magnitude R2 -0.199; order is predicted, size is not", "sep_factor_eval_results.csv"],
     ["Comparison with Dr. Zhang (same data)", "ours vs his XGBoost", "ours 0.657 CV / 0.692 holdout", "", "", "common split + his 494-row holdout", "His 0.648 / 0.680; about equal, the split drives his 0.72 headline", "zhang_2x2_results.csv"],
 ]
 df = pd.DataFrame(R, columns=COLS)
