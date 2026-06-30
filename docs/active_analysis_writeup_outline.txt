@@ -1,0 +1,45 @@
+ACTIVE ANALYSIS FOR SELECTING f-ELEMENT EXTRACTANTS - WRITEUP OUTLINE
+(skeleton only; prose to be written by Skyler. Figures are in REE_logD_submission/figures/.)
+
+1. MOTIVATION
+   - f-element separation is hard and important (nuclear waste, REE recycling, isotopes)
+   - cannot test every extractant-metal-condition; question is which experiments to run
+   - thesis: a model with calibrated uncertainty can prioritize experiments. [no figure]
+
+2. THE PREDICTIVE MODEL (foundation)
+   - predict dG of extraction (or logD) from structure + metal; honest accuracy moderate (dG R2 ~0.46 new molecule)
+   - value is in the uncertainty, not the point estimate; 90% intervals calibrated (cover 90.2%)
+   - FIGURE: active_analysis.png (left, calibration) or conformal_calibration.png
+
+3. METHODS: HOW CANDIDATES ARE RANKED
+   - acquisition rules: greedy (prediction), UCB (prediction + uncertainty), uncertainty sampling, random baseline
+   - triage: accept confident predictions (no experiment), test uncertain ones. [no figure / loop schematic]
+
+4. CORE RESULT: DOES IT CHOOSE GOOD EXTRACTANTS?
+   - greedy: 81% of top picks in strongest tertile (vs 37% random); beats each metal's average
+   - precision@10% 0.43 vs 0.12 random (3.6x); captures ~62% of achievable strength
+   - honest limit: ~57% of top-decile picks miss the true elite; prioritizer not oracle
+   - FIGURE: active_analysis_trends.png (4-panel); support with active_analysis.png (middle)
+
+5. WHAT GETS CHOSEN (TRENDS)
+   - metals: americium + trivalent lanthanides/actinides dominate (Am 2.85x, 30% of picks)
+   - structure: modest lean to less-aromatic / aliphatic, consistent with organophosphorus extractants
+   - FIGURE: picks_trends.png
+
+6. UCB VS ALTERNATIVES, AND OVER ROUNDS
+   - one-shot: greedy matches/beats UCB; uncertainty bonus dilutes immediate yield
+   - sequential: uncertainty sampling improves the model fastest (R2 0.56 vs 0.44); UCB ties greedy on discovery
+   - pseudo-labeling confident predictions adds nothing (~+0.00 R2): real experiments required
+   - FIGURE: ucb_graphs.png
+
+7. THE CLOSED LOOP (END GOAL)
+   - predict -> prioritize -> run experiments -> feed back -> retrain -> repeat
+   - each round adds distinct extractants (the binding bottleneck; ~295 today)
+   - converges on selective extractants for a target pair with far fewer experiments. [optional loop diagram]
+
+8. RIGOR AND HONEST LIMITS
+   - audit-validated: genuine molecule-grouped CV, no feature-target leakage, calibrated intervals
+   - moderate base model; ~295-molecule dataset caps accuracy; numbers on cleaned data (upper bound)
+
+9. SIGNIFICANCE / CONCLUSION
+   - a self-improving, uncertainty-aware recommender that accelerates the search for separating extractants
