@@ -1,0 +1,4 @@
+method,good,mid,weak
+greedy,0.815,0.11,0.075
+UCB,0.661,0.154,0.185
+random,0.374,0.304,0.322

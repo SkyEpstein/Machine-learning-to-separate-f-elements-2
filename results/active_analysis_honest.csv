@@ -1,0 +1,4 @@
+method,good_tertile_share,strong_tail_share,precision_at10,depth_captured
+greedy,0.81,0.43,0.427,0.62
+UCB,0.66,0.4,0.401,0.43
+random,0.37,0.12,0.119,0.02

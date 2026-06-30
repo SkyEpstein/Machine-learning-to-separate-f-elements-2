@@ -1,0 +1,4 @@
+track,R2_mean,R2_std,RMSE_mean
+A new-molecule (grouped),0.481,0.008,1.131
+B known-molecule (random),0.68,0.001,0.888
+"B features, grouped (honest new-mol)",0.443,0.001,1.172
