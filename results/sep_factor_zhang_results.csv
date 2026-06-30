@@ -1,0 +1,7 @@
+model,regime,coverage,n,signed_R2,signed_RMSE,norm_RMSE,magnitude_R2,direction_acc,spearman,useful_F1
+Zhang XGBoost,known extractant,100%,4598,0.369,1.281,0.794,0.121,0.715,0.604,0.593
+Zhang XGBoost,known extractant,50%,2299,0.398,0.744,0.776,-0.035,0.718,0.646,0.408
+Zhang XGBoost,known extractant,10%,459,0.47,0.541,0.728,-0.0,0.704,0.606,0.415
+Zhang XGBoost,new extractant,100%,4598,0.227,1.418,0.879,-0.145,0.672,0.507,0.439
+Zhang XGBoost,new extractant,50%,2299,0.366,1.0,0.796,-0.01,0.691,0.549,0.509
+Zhang XGBoost,new extractant,10%,459,0.14,0.866,0.928,-0.325,0.721,0.484,0.353
