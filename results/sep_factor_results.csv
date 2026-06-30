@@ -1,0 +1,3 @@
+method,signed_R2,signed_RMSE,magnitude_R2,direction_acc
+direct delta model,-1.924,2.758,-3.319,0.599
+differencing baseline,0.188,1.453,-0.199,0.656
