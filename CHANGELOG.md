@@ -2,6 +2,10 @@
 
 A reverse-chronological log of major milestones and decisions. Numbers are the audited, honest values.
 
+## 2026-07-01 Working rules and confidence-forward Zhang
+- Added the separation slides (order, confidence, and the confidence-forward Zhang comparison) and the sep_zhang_confidence figure to the deck; referenced it in the methods doc; corrected the residual "Zhang has no confidence layer" wording to the model-agnostic framing across all docs (zero residual).
+- Codified two standing working rules in the constitution (principles 11 and 12) and the spec-feature skill: always update every artifact in the same pass, and run every substantive change through the spec-driven-development lifecycle.
+
 ## 2026-07-01 Separation recommender (inverse design)
 - Added the held-out-extractant test (sep_recommend_holdout.py), the honest prospective validation: hold entire extractants out (molecule-grouped) and rank the novel ones by predicted separation. Pooled over the 3 pairs with >=8 distinct held-out extractants (32 cases): direction 0.594 and |sep| Spearman 0.096 overall, rising to direction 0.765 and Spearman 0.196 on the confident half. Uneven per pair (Am/Eu direction 0.80, confident-half 1.00; Er/Tb 0.44). Only 3 pairs have enough distinct extractants to run the test, itself a finding. Honest verdict: vetting a truly novel extractant is weak and only usable on the confident subset, mainly for direction not magnitude. A random split would have lied.
 - Constitution: added the organizing purpose (vet new extractants and conditions before lab work) to the Mission, and principle 11 (splits mirror deployment: entire extractants held out and vetted as novel; a recommender is not trusted until it passes the held-out-extractant test, not merely row cross-validation).

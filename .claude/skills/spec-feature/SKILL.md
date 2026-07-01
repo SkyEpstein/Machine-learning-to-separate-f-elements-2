@@ -22,7 +22,7 @@ Follow this loop for any substantive new work. It encodes the project constituti
 - Tick `validation.md`. If a check fails, fix the spec and the work; do not paper over it.
 
 ## 4. Record and commit
-- Update `CHANGELOG.md`, and if a headline number changed, `METHODS_AND_RESULTS.md` and the workbook.
+- Update ALL artifacts the change touches, not just some: the deck, the workbook and the master results table, the README, `METHODS_AND_RESULTS.md`, `MANUSCRIPT_FIGURES.md`, `RESULTS_TABLE.md`, the figures, and `CHANGELOG.md`. Then grep the repo for the old value and confirm no residual stale numbers or old framing remain (the "always update everything" rule).
 - Confirm the active gh account is SkyEpstein.
 - Ask Skyler what the commit message should say (offer a suggested message plus a free-text option), commit with his wording, and push under SkyEpstein.
 
