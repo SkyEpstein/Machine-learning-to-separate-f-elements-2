@@ -12,7 +12,7 @@ A curated, publication-ready set for the writeup. The full figure set is in `fig
 | 90% interval coverage | 0.902 (target 0.90) | n/a | molecule-disjoint conformal |
 | Separation factor (known extractant) | signed R2 0.356, direction 0.726 | direction 0.789, Spearman 0.776, norm RMSE 0.64 | condition-key, matched conditions |
 | Separation factor (new extractant) | signed R2 0.188, direction 0.656 | confidence not net-useful | molecule-grouped CV |
-| Separation, Zhang XGBoost (known) | signed R2 0.369, direction 0.715 | none (his model has no confidence layer) | condition-key, matched conditions |
+| Separation, Zhang XGBoost (known) | signed R2 0.369, direction 0.715 | none as published (the confidence layer is model-agnostic; applied to his model it reaches top-10% signed R2 0.470, still below ours) | condition-key, matched conditions |
 
 ## Main figures (narrative order)
 

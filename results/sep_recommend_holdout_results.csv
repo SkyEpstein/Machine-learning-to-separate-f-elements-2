@@ -1,0 +1,4 @@
+pair,n_ext,dir_acc,spearman_absep,prec@25%,enrichment,dir_acc_conf50,spearman_conf50
+Am(III)/Eu(III),15,0.8,0.161,0.25,1.0,1.0,0.429
+Er(III)/Tb(III),9,0.444,-0.133,0.0,0.0,0.6,-0.8
+Dy(III)/Er(III),8,0.375,0.19,0.5,2.0,0.5,0.8

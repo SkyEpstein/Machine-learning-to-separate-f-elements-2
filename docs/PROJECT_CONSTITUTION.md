@@ -2,7 +2,7 @@
 ### Machine learning for f-element separation
 
 ## 1. Mission
-Build an honest, reproducible machine-learning system that predicts how well an extractant separates two f-elements, and, more importantly, guides which experiments to run next so that selective extractants are found with far fewer experiments than brute-force testing. The code and modeling are LLM-assisted. The scientific manuscript is written by Skyler Epstein.
+Build an honest, reproducible machine-learning system that predicts how well an extractant separates two f-elements, and, more importantly, guides which experiments to run next so that selective extractants are found with far fewer experiments than brute-force testing. The single organizing purpose is to **vet new extractants and their conditions computationally before any lab work**, so chemists synthesize and test only the most promising candidates. Every modeling and evaluation choice serves that purpose. The code and modeling are LLM-assisted. The scientific manuscript is written by Skyler Epstein.
 
 ## 2. Scope
 **In scope:** prediction of logD and the free energy of extraction (delta G); calibrated per-prediction uncertainty; active analysis (ranking which experiments to run, and triage of which predictions to trust); the closed-loop discovery cycle; the comparison with Dr. Zhang's published model.
@@ -22,6 +22,7 @@ Reinforced by a full adversarial audit; every result must satisfy these.
 8. **Plain, honest writing.** Plain technical prose, no em dashes, no marketing or AI-sounding language.
 9. **Audit before publishing.** Adversarially check for leakage, overfitting, and optimistic framing before a result is presented or pushed.
 10. **Evidence-based selection.** Every model, feature set, confidence estimator, and acquisition rule is chosen by a documented bake-off under the same honest evaluation, never arbitrarily. Rejected approaches are recorded alongside the winners.
+11. **Splits mirror deployment (purposeful held-out testing).** Because the system exists to vet extractants that have never been measured, every claim about a new extractant is evaluated by holding entire extractants out and vetting them as novel (extractant-disjoint / molecule-grouped splits, and for separation the same discipline on both metals' rows), never a random split that lets a candidate's own measurements leak into training. The deployment-relevant metric is the held-out-extractant vetting result (does ranking novel extractants by predicted separation recover the ones that separate best), reported with its confidence-filtered subset and honestly even when it is weak. A recommender or screen is not trusted until it has passed this held-out-extractant test, not merely cross-validation on rows.
 
 ## 4. Method selection by bake-off
 New methods are never adopted on intuition. Every modeling choice is decided by a bake-off: all candidate models, feature sets, confidence estimators, and acquisition rules are run under the same honest cross-validation, and the winner is chosen by the metrics (R-squared and RMSE together), with the full comparison saved. Nothing in the deployed system is arbitrarily selected, and the approaches that lost are documented next to the ones that won, so any choice can be traced to the evidence behind it.
