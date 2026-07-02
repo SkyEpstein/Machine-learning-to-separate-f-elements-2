@@ -1,0 +1,2 @@
+smiles,valid,novel,best_pair,best_gap,best_SF,best_unc,cand_unc,best_support
+CC(C)(C)C1CCC(P(=S)(S)C2CCC(C(C)(C)C)CC2)CC1,True,True,Am(III)/La(III),1.602,40.0,0.31,0.242,36

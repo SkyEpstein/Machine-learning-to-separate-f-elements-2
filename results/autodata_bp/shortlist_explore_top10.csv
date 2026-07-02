@@ -1,0 +1,9 @@
+smiles,explore_pair,explore_SF,explore_unc,explore_support,cand_unc
+CCCCN(CCCC)C(=S)c1cccc(C(=S)N(CCCC)CCCC)n1,Cm(III)/La(III),59.0,0.266,5,0.189
+CCC1CCC(P(=S)(S)C2CCC(CC)CC2)CC1,Am(III)/Pu(IV),46.9,0.278,13,0.255
+S=P(S)(CC1CCCCC1)CC1CCCCC1,Am(III)/Pu(IV),45.5,0.25,13,0.24
+CC(C)(C)c1ccc(P(=S)(S)c2ccc(F)cc2)cc1,Cm(III)/La(III),27.0,0.27,5,0.258
+CCCCCCP(=S)(S)c1ccc(C(C)(C)C)cc1,Cm(III)/Pr(III),26.5,0.239,5,0.241
+S=P(S)(c1cccs1)C1CCCCC1,Cm(III)/Pr(III),25.3,0.247,5,0.199
+CC(C)CN(CC(C)C)C(=S)CC(=S)N(CC(C)C)CC(C)C,Am(III)/Pu(IV),18.6,0.277,13,0.222
+CCCCC(CC)CN(CC(CC)CCCC)C(=S)CCC(=S)N(CC(CC)CCCC)CC(CC)CCCC,Cm(III)/Gd(III),18.4,0.275,5,0.209
